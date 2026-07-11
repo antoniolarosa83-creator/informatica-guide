@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informatica — Guida di Studio Anno 2 · Algoritmi e Flowgorithm</title>
+<style>
+  :root{
+    --blu:#1e3a8a; --blu2:#3b82f6; --cielo:#dbeafe; --arancio:#f97316;
+    --giallo:#fbbf24; --verde:#16a34a; --rosso:#dc2626; --viola:#7c3aed;
+    --grigio:#475569; --sfondo:#f1f5f9; --carta:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--sfondo); color:#1e293b; overflow:hidden;}
+  .slide{display:none; position:fixed; inset:0 0 64px 0; overflow-y:auto; padding:36px 60px 30px 60px;}
+  .slide.active{display:block; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;}}
+  .slide h1{color:var(--blu); font-size:2.1em; border-bottom:4px solid var(--arancio); padding-bottom:8px; margin-bottom:22px;}
+  .slide h2{color:var(--blu2); font-size:1.3em; margin:18px 0 8px;}
+  .slide p, .slide li{font-size:1.12em; line-height:1.55;}
+  .slide ul, .slide ol{margin:10px 0 10px 28px;}
+  .slide li{margin-bottom:6px;}
+  .center{text-align:center;}
+  .cols{display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;}
+  .cols > div{flex:1; min-width:280px;}
+  .box{background:var(--carta); border-radius:14px; padding:18px 22px; box-shadow:0 2px 10px rgba(0,0,0,.09); margin:12px 0;}
+  .nota{background:#fff7ed; border-left:6px solid var(--arancio); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .curiosita{background:#f0fdf4; border-left:6px solid var(--verde); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .esempio{background:#eef2ff; border-left:6px solid var(--viola); border-radius:8px; padding:12px 16px; margin:14px 0;}
+  .badge{display:inline-block; background:var(--arancio); color:#fff; border-radius:20px; padding:3px 14px; font-size:.8em; font-weight:bold; letter-spacing:1px; margin-bottom:10px;}
+  table{border-collapse:collapse; margin:14px auto; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  th{background:var(--blu); color:#fff; padding:9px 16px; font-size:1em;}
+  td{border:1px solid #cbd5e1; padding:8px 16px; text-align:center; font-size:1.05em;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .mono{font-family:'Consolas','Courier New',monospace; font-weight:bold;}
+  svg{max-width:100%; height:auto; display:block; margin:10px auto;}
+  .pseudo{background:#fffbeb; border:2px solid #fcd34d; border-radius:10px; padding:14px 20px; font-family:Consolas,monospace; font-size:1.1em; line-height:1.7; margin:12px 0; white-space:pre;}
+  .pseudo b{color:#b45309;}
+  #nav{position:fixed; bottom:0; left:0; right:0; height:64px; background:var(--blu); display:flex; align-items:center; justify-content:space-between; padding:0 26px; z-index:10;}
+  #nav button{background:var(--arancio); color:#fff; border:none; border-radius:10px; padding:10px 26px; font-size:1.05em; font-weight:bold; cursor:pointer;}
+  #nav button:hover{background:#ea580c;}
+  #nav button:disabled{background:#64748b; cursor:default;}
+  #contatore{color:#fff; font-size:1.1em; font-weight:bold;}
+  #barra{position:fixed; bottom:64px; left:0; height:5px; background:var(--arancio); z-index:11; transition:width .3s;}
+  .eser{background:#fff; border:2px solid var(--cielo); border-radius:12px; padding:14px 18px; margin:10px 0; display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .eser .dom{font-size:1.1em; font-weight:bold; min-width:300px; flex:2;}
+  .eser input{font-family:Consolas,monospace; font-size:1.1em; padding:8px 12px; border:2px solid #94a3b8; border-radius:8px; width:150px;}
+  .eser button{background:var(--blu2); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:1em; font-weight:bold; cursor:pointer;}
+  .eser button:hover{background:var(--blu);}
+  .eser .fb{font-weight:bold; font-size:1.05em; min-width:160px;}
+  .ok{color:var(--verde);} .no{color:var(--rosso);}
+  .quiz{background:#fff; border-radius:12px; padding:16px 20px; margin:12px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .quiz p{font-weight:bold; margin-bottom:8px;}
+  .quiz label{display:block; padding:7px 12px; border-radius:8px; cursor:pointer; margin:4px 0; border:2px solid transparent; font-size:1.05em;}
+  .quiz label:hover{background:var(--cielo);}
+  .quiz label.giusta{background:#dcfce7; border-color:var(--verde);}
+  .quiz label.sbagliata{background:#fee2e2; border-color:var(--rosso);}
+  .titolone{font-size:3em; color:var(--blu); margin:30px 0 10px;}
+  .sottotitolo{font-size:1.5em; color:var(--grigio);}
+  .filecard{background:#fff; border:2px solid #cbd5e1; border-left:8px solid var(--blu2); border-radius:10px; padding:10px 16px; margin:8px 0;}
+  .filecard .nomef{font-family:Consolas,monospace; font-weight:bold; color:var(--blu); font-size:1.05em;}
+  .passo{display:flex; gap:14px; align-items:flex-start; background:#fff; border-radius:12px; padding:12px 16px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .passo .num{background:var(--arancio); color:#fff; min-width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2em; font-weight:bold;}
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 : COPERTINA ============ -->
+<section class="slide active">
+  <div class="center" style="padding-top:20px;">
+    <svg viewBox="0 0 560 250" width="480">
+      <rect x="215" y="10" width="130" height="42" rx="21" fill="#c084fc" stroke="#7c3aed" stroke-width="3"/>
+      <text x="280" y="37" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">Inizio</text>
+      <line x1="280" y1="52" x2="280" y2="78" stroke="#475569" stroke-width="4"/>
+      <polygon points="200,78 380,78 360,120 180,120" fill="#86efac" stroke="#16a34a" stroke-width="3"/>
+      <text x="280" y="105" text-anchor="middle" font-size="16" fill="#14532d" font-weight="bold">Scrivi "Ciao classe!"</text>
+      <line x1="280" y1="120" x2="280" y2="146" stroke="#475569" stroke-width="4"/>
+      <polygon points="280,146 350,183 280,220 210,183" fill="#fda4af" stroke="#dc2626" stroke-width="3"/>
+      <text x="280" y="189" text-anchor="middle" font-size="15" fill="#7f1d1d" font-weight="bold">promosso?</text>
+      <line x1="350" y1="183" x2="420" y2="183" stroke="#475569" stroke-width="4"/>
+      <text x="385" y="172" text-anchor="middle" font-size="13" fill="#16a34a" font-weight="bold">Vero</text>
+      <text x="455" y="190" font-size="26">🎉</text>
+      <line x1="210" y1="183" x2="140" y2="183" stroke="#475569" stroke-width="4"/>
+      <text x="175" y="172" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">Falso</text>
+      <text x="80" y="192" font-size="26">📚</text>
+    </svg>
+    <div class="titolone">ALGORITMI</div>
+    <div class="sottotitolo">Guida di studio — Secondo anno</div>
+    <p style="margin-top:22px; font-size:1.2em;">Diagrammi di flusso · Flowgorithm · Variabili · Selezione<br>Connettivi logici · Cicli FOR, WHILE e DO-WHILE · Esercizi</p>
+    <p style="margin-top:26px; color:var(--grigio);">Usa le frecce ⬅ ➡ della tastiera o i pulsanti in basso per navigare</p>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 : INDICE ============ -->
+<section class="slide">
+  <h1>📚 Cosa impareremo</h1>
+  <div class="cols">
+    <div>
+      <div class="box"><h2>1️⃣ Gli algoritmi</h2><p>Cosa sono, quali proprietà devono avere e come si disegnano con i diagrammi di flusso.</p></div>
+      <div class="box"><h2>2️⃣ Flowgorithm</h2><p>Dove scaricarlo, come installarlo e come usare la sua interfaccia per creare il tuo primo algoritmo.</p></div>
+      <div class="box"><h2>3️⃣ Variabili e operazioni</h2><p>Dichiarazione, Leggi, Scrivi, Assegnazione e gli operatori aritmetici e di confronto.</p></div>
+    </div>
+    <div>
+      <div class="box"><h2>4️⃣ Selezione e connettivi</h2><p>Il costrutto SE…ALLORA…ALTRIMENTI, i SE annidati e i connettivi logici E (AND) e O (OR).</p></div>
+      <div class="box"><h2>5️⃣ I cicli</h2><p>FOR, WHILE e DO-WHILE: ripetere le istruzioni senza impazzire (e senza cicli infiniti!).</p></div>
+      <div class="box"><h2>6️⃣ Esercizi</h2><p>Esercizi guidati estratti dal libro, quiz interattivi e la guida per scaricare i file .fprg di esempio.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 3 : COS'È UN ALGORITMO ============ -->
+<section class="slide">
+  <span class="badge">ALGORITMI</span>
+  <h1>🧩 Che cos'è un algoritmo?</h1>
+  <p>Un <b>algoritmo</b> è una sequenza <b>finita</b> e <b>ordinata</b> di istruzioni <b>non ambigue</b> che, eseguite una dopo l'altra, risolvono un problema.</p>
+  <div class="cols">
+    <div>
+      <div class="esempio"><b>💡 Un algoritmo che conosci già: la ricetta! 🍝</b><br>
+      1. Metti l'acqua nella pentola<br>
+      2. Quando bolle, butta la pasta<br>
+      3. Aspetta 10 minuti<br>
+      4. Scola e condisci<br><br>
+      Ingredienti = <b>input</b> · procedimento = <b>elaborazione</b> · piatto pronto = <b>output</b>.</div>
+    </div>
+    <div>
+      <h2>Le proprietà fondamentali</h2>
+      <ul>
+        <li><b>Finitezza:</b> deve terminare dopo un numero finito di passi</li>
+        <li><b>Non ambiguità:</b> ogni istruzione ha un solo significato</li>
+        <li><b>Eseguibilità:</b> ogni passo deve poter essere eseguito davvero</li>
+        <li><b>Generalità:</b> risolve tutti i problemi dello stesso tipo, non uno solo</li>
+      </ul>
+    </div>
+  </div>
+  <div class="curiosita"><b>🔎 Curiosità:</b> la parola "algoritmo" viene da <b>al-Khwarizmi</b>, matematico persiano del IX secolo. I suoi libri di calcolo erano così famosi che il suo nome è diventato… un concetto!</div>
+</section>
+
+<!-- ============ SLIDE 4 : DIAGRAMMI DI FLUSSO ============ -->
+<section class="slide">
+  <span class="badge">ALGORITMI</span>
+  <h1>📐 I diagrammi di flusso: i blocchi</h1>
+  <p>Un <b>diagramma di flusso</b> rappresenta l'algoritmo con blocchi grafici collegati da frecce. Ogni <b>forma</b> ha un significato preciso:</p>
+  <svg viewBox="0 0 780 300" width="740">
+    <rect x="20" y="20" width="150" height="50" rx="25" fill="#c084fc" stroke="#7c3aed" stroke-width="3"/>
+    <text x="95" y="51" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">Inizio / Fine</text>
+    <text x="95" y="95" text-anchor="middle" font-size="14" fill="#475569">ovale: apre e chiude</text>
+    <polygon points="230,20 400,20 380,70 210,70" fill="#93c5fd" stroke="#1d4ed8" stroke-width="3"/>
+    <text x="305" y="51" text-anchor="middle" font-size="16" fill="#1e3a8a" font-weight="bold">Input / Output</text>
+    <text x="305" y="95" text-anchor="middle" font-size="14" fill="#475569">parallelogramma: Leggi / Scrivi</text>
+    <rect x="440" y="20" width="170" height="50" fill="#fde68a" stroke="#d97706" stroke-width="3"/>
+    <text x="525" y="51" text-anchor="middle" font-size="16" fill="#78350f" font-weight="bold">Elaborazione</text>
+    <text x="525" y="95" text-anchor="middle" font-size="14" fill="#475569">rettangolo: calcoli e assegnazioni</text>
+    <polygon points="695,15 765,55 695,95 625,55" fill="#fda4af" stroke="#dc2626" stroke-width="3"/>
+    <text x="695" y="61" text-anchor="middle" font-size="15" fill="#7f1d1d" font-weight="bold">Selezione</text>
+    <text x="695" y="120" text-anchor="middle" font-size="14" fill="#475569">rombo: decisioni</text>
+    <!-- esempio completo -->
+    <rect x="120" y="150" width="560" height="130" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="400" y="175" text-anchor="middle" font-size="15" fill="#475569" font-weight="bold">Esempio: "raddoppia un numero"</text>
+    <rect x="140" y="195" width="90" height="36" rx="18" fill="#c084fc"/><text x="185" y="218" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Inizio</text>
+    <path d="M232 213 h28 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="3" fill="none"/>
+    <polygon points="268,195 360,195 348,231 256,231" fill="#93c5fd"/><text x="308" y="218" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">Leggi n</text>
+    <path d="M362 213 h28 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="3" fill="none"/>
+    <rect x="396" y="195" width="100" height="36" fill="#fde68a"/><text x="446" y="218" text-anchor="middle" font-size="13" fill="#78350f" font-weight="bold">d = 2*n</text>
+    <path d="M498 213 h28 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="3" fill="none"/>
+    <polygon points="534,195 626,195 614,231 522,231" fill="#86efac"/><text x="574" y="218" text-anchor="middle" font-size="13" fill="#14532d" font-weight="bold">Scrivi d</text>
+    <path d="M628 213 h20 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="3" fill="none"/>
+    <rect x="652" y="195" width="20" height="36" rx="10" fill="#c084fc"/>
+    <text x="662" y="255" text-anchor="middle" font-size="11" fill="#475569">Fine</text>
+  </svg>
+  <div class="nota"><b>📌 Da ricordare:</b> le frecce indicano il <b>flusso</b>, cioè l'ordine di esecuzione. Si parte sempre da <b>Inizio</b> e si arriva sempre a <b>Fine</b>.</div>
+</section>
+
+<!-- ============ SLIDE 5 : SCHEMA PROGETTUALE ============ -->
+<section class="slide">
+  <span class="badge">ALGORITMI</span>
+  <h1>🏗️ Lo schema progettuale di ogni algoritmo</h1>
+  <p>Il libro ci insegna che (quasi) ogni algoritmo segue sempre lo stesso <b>schema in 4 fasi</b>:</p>
+  <svg viewBox="0 0 760 120" width="720">
+    <rect x="10" y="25" width="170" height="70" rx="12" fill="#eab308"/>
+    <text x="95" y="55" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">1. DICHIARAZIONE</text>
+    <text x="95" y="78" text-anchor="middle" font-size="12" fill="#fef9c3">delle variabili</text>
+    <path d="M183 60 h22 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="4" fill="none"/>
+    <rect x="208" y="25" width="170" height="70" rx="12" fill="#0891b2"/>
+    <text x="293" y="55" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">2. ACQUISIZIONE</text>
+    <text x="293" y="78" text-anchor="middle" font-size="12" fill="#cffafe">dei dati in ingresso</text>
+    <path d="M381 60 h22 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="4" fill="none"/>
+    <rect x="406" y="25" width="170" height="70" rx="12" fill="#7c3aed"/>
+    <text x="491" y="55" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">3. ELABORAZIONE</text>
+    <text x="491" y="78" text-anchor="middle" font-size="12" fill="#ede9fe">dei dati</text>
+    <path d="M579 60 h22 l-8 -7 m8 7 l-8 7" stroke="#475569" stroke-width="4" fill="none"/>
+    <rect x="604" y="25" width="150" height="70" rx="12" fill="#16a34a"/>
+    <text x="679" y="55" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">4. RESTITUZIONE</text>
+    <text x="679" y="78" text-anchor="middle" font-size="12" fill="#dcfce7">dei dati in uscita</text>
+  </svg>
+  <div class="esempio"><b>💡 Esempio — "calcola la media di due voti":</b><br>
+  1) <b>Dichiaro</b> le variabili voto1, voto2, media → 2) <b>Acquisisco</b> voto1 e voto2 dall'utente → 3) <b>Elaboro</b>: media = (voto1+voto2)/2 → 4) <b>Restituisco</b>: scrivo media sullo schermo.</div>
+  <div class="nota"><b>📌 Impara questo schema a memoria:</b> ti servirà per impostare OGNI esercizio di Flowgorithm. Prima di aprire il programma, chiediti sempre: quali variabili? quali input? che calcolo? che output?</div>
+</section>
+
+<!-- ============ SLIDE 6 : FLOWGORITHM COS'È + DOWNLOAD ============ -->
+<section class="slide">
+  <span class="badge">FLOWGORITHM</span>
+  <h1>⬇️ Flowgorithm: cos'è e dove scaricarlo</h1>
+  <div class="cols">
+    <div>
+      <p><b>Flowgorithm</b> è un ambiente didattico <b>gratuito</b> per imparare la programmazione disegnando <b>diagrammi di flusso</b> che si possono <b>eseguire davvero</b>, senza scrivere codice.</p>
+      <h2>🌐 Il sito ufficiale per il download</h2>
+      <div class="box center" style="border:3px solid var(--arancio);">
+        <p style="font-size:1.3em;" class="mono">flowgorithm.org</p>
+        <p>pagina download:</p>
+        <p class="mono" style="font-size:1.05em;">http://www.flowgorithm.org/download/index.htm</p>
+      </div>
+      <p>Il download è <b>libero</b>: non serve alcuna registrazione.</p>
+    </div>
+    <div>
+      <h2>📥 Come installarlo, passo per passo</h2>
+      <div class="passo"><div class="num">1</div><div>Apri il browser e vai su <span class="mono">flowgorithm.org</span>, poi clicca sulla scheda <b>Download</b>.</div></div>
+      <div class="passo"><div class="num">2</div><div>Scegli la versione per il tuo sistema: <b>Windows 64-Bit</b> (per Windows 10/11) oppure 32-Bit per PC più vecchi.</div></div>
+      <div class="passo"><div class="num">3</div><div>Avvia il file scaricato e segui l'installazione guidata (Avanti → Avanti → Fine).</div></div>
+      <div class="passo"><div class="num">4</div><div>Alla <b>prima apertura</b> scegli la lingua <b>Italiano</b>. Potrai cambiarla in seguito dal menu <b>Strumenti</b>.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 7 : INTERFACCIA ============ -->
+<section class="slide">
+  <span class="badge">FLOWGORITHM</span>
+  <h1>🖼️ L'interfaccia di Flowgorithm</h1>
+  <svg viewBox="0 0 780 380" width="700">
+    <rect x="60" y="20" width="660" height="340" rx="8" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
+    <rect x="60" y="20" width="660" height="30" rx="8" fill="#1e3a8a"/>
+    <text x="80" y="40" font-size="13" fill="#fff">(Senza titolo) - Flowgorithm</text>
+    <rect x="60" y="50" width="660" height="24" fill="#f1f5f9"/>
+    <text x="80" y="67" font-size="12" fill="#334155">File   Modifica   Programma   Strumenti   Aiuto</text>
+    <rect x="60" y="74" width="660" height="30" fill="#e2e8f0"/>
+    <rect x="72" y="79" width="20" height="20" rx="3" fill="#fbbf24"/>
+    <rect x="98" y="79" width="20" height="20" rx="3" fill="#94a3b8"/>
+    <polygon points="130,81 130,97 144,89" fill="#16a34a"/>
+    <rect x="152" y="79" width="20" height="20" rx="3" fill="#94a3b8"/>
+    <rect x="178" y="79" width="20" height="20" rx="3" fill="#94a3b8"/>
+    <rect x="380" y="110 " width="120" height="34" rx="17" fill="#c084fc" stroke="#7c3aed" stroke-width="2"/>
+    <text x="440" y="132" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">Inizio</text>
+    <line x1="440" y1="144" x2="440" y2="180" stroke="#475569" stroke-width="3"/>
+    <rect x="380" y="180" width="120" height="34" rx="17" fill="#c084fc" stroke="#7c3aed" stroke-width="2"/>
+    <text x="440" y="202" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">Fine</text>
+    <rect x="640" y="330" width="30" height="20" rx="4" fill="#1e3a8a"/>
+    <text x="655" y="344" text-anchor="middle" font-size="11" fill="#fff">IT</text>
+    <!-- etichette -->
+    <rect x="200" y="8" width="150" height="26" rx="6" fill="#f97316"/><text x="275" y="26" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Barra dei menu ⤵</text>
+    <rect x="10" y="74" width="110" height="40" rx="6" fill="#f97316"/><text x="65" y="91" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Icona Esegui ▶</text><text x="65" y="106" text-anchor="middle" font-size="10" fill="#ffedd5">avvia l'algoritmo</text>
+    <line x1="120" y1="94" x2="137" y2="92" stroke="#f97316" stroke-width="3"/>
+    <rect x="540" y="120" width="150" height="26" rx="6" fill="#f97316"/><text x="615" y="138" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Blocchi Inizio e Fine</text>
+    <line x1="540" y1="133" x2="505" y2="130" stroke="#f97316" stroke-width="3"/>
+    <rect x="120" y="250" width="150" height="26" rx="6" fill="#f97316"/><text x="195" y="268" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Area di lavoro</text>
+    <rect x="480" y="300" width="140" height="26" rx="6" fill="#f97316"/><text x="550" y="318" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Icona lingua ⤵</text>
+    <line x1="620" y1="318" x2="640" y2="335" stroke="#f97316" stroke-width="3"/>
+  </svg>
+  <div class="esempio"><b>💡 Come si aggiunge un blocco?</b> Passa il mouse sulla <b>freccia</b> tra Inizio e Fine: si colora di arancione. <b>Clicca</b> e scegli il blocco dalla finestra che compare. Per modificarlo, <b>doppio clic</b> sul blocco.</div>
+</section>
+
+<!-- ============ SLIDE 8 : I BLOCCHI ============ -->
+<section class="slide">
+  <span class="badge">FLOWGORITHM</span>
+  <h1>🧱 I blocchi di Flowgorithm</h1>
+  <p>Quando clicchi su una freccia, Flowgorithm ti propone i suoi blocchi, organizzati per categoria:</p>
+  <table style="font-size:1.05em;">
+    <tr><th>Categoria</th><th>Blocco</th><th>Forma e colore</th><th>A cosa serve</th></tr>
+    <tr><td rowspan="2"><b>Lettura / Scrittura</b></td><td><b>Leggi</b></td><td style="color:#1d4ed8;">parallelogramma azzurro</td><td>riceve un valore dalla tastiera (input)</td></tr>
+    <tr><td><b>Scrivi</b></td><td style="color:#16a34a;">parallelogramma verde</td><td>stampa testo e risultati sullo schermo (output)</td></tr>
+    <tr><td rowspan="2"><b>Variabili</b></td><td><b>Dichiarazione</b></td><td style="color:#b45309;">rettangolo giallo (bordo doppio)</td><td>crea le variabili e ne fissa il tipo</td></tr>
+    <tr><td><b>Assegnazione</b></td><td style="color:#b45309;">rettangolo giallo</td><td>calcola un'espressione e la salva in una variabile</td></tr>
+    <tr><td><b>Selezione</b></td><td><b>Se</b></td><td style="color:#dc2626;">rombo rosa</td><td>sceglie tra due strade (Vero / Falso)</td></tr>
+    <tr><td rowspan="3"><b>Ripetizione</b></td><td><b>Mentre</b></td><td style="color:#d97706;">esagono arancione</td><td>ciclo con condizione all'inizio (while)</td></tr>
+    <tr><td><b>Per</b></td><td style="color:#d97706;">esagono arancione</td><td>ciclo con contatore automatico (for)</td></tr>
+    <tr><td><b>Fai</b></td><td style="color:#d97706;">esagono arancione</td><td>ciclo con condizione alla fine (do-while)</td></tr>
+  </table>
+  <div class="nota"><b>📌 Trucco dei colori:</b> azzurro = entra, verde = esce, giallo = calcola, rosa = decide, arancione = ripete. Gli stessi colori compaiono nella finestra <b>Esecuzione</b>!</div>
+</section>
+<!-- ============ SLIDE 9 : VARIABILI E TIPI ============ -->
+<section class="slide">
+  <span class="badge">VARIABILI</span>
+  <h1>📦 Le variabili e i tipi di dato</h1>
+  <div class="cols">
+    <div>
+      <p>Una <b>variabile</b> è una "scatola" con un <b>nome</b>, che contiene un valore che può cambiare durante l'esecuzione.</p>
+      <svg viewBox="0 0 340 170" width="310">
+        <rect x="40" y="45" width="110" height="90" rx="10" fill="#d97706"/>
+        <rect x="50" y="55" width="90" height="70" rx="6" fill="#fbbf24"/>
+        <text x="95" y="97" text-anchor="middle" font-size="26" fill="#78350f" font-weight="bold">42</text>
+        <rect x="55" y="20" width="80" height="26" rx="6" fill="#1e3a8a"/>
+        <text x="95" y="38" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">num</text>
+        <text x="240" y="70" text-anchor="middle" font-size="14" fill="#475569">nome = etichetta</text>
+        <text x="240" y="95" text-anchor="middle" font-size="14" fill="#475569">valore = contenuto</text>
+        <text x="240" y="120" text-anchor="middle" font-size="14" fill="#475569">tipo = cosa può contenere</text>
+      </svg>
+      <div class="nota"><b>📌 Regole per i nomi:</b> niente spazi, niente accenti, non si inizia con un numero. Meglio nomi parlanti: <span class="mono">altezza</span> è più chiaro di <span class="mono">x</span>!</div>
+    </div>
+    <div>
+      <h2>I 4 tipi di Flowgorithm</h2>
+      <table>
+        <tr><th>Tipo</th><th>Contiene</th><th>Esempi</th></tr>
+        <tr><td><b>Intero</b></td><td>numeri senza virgola</td><td class="mono">5, -3, 1000</td></tr>
+        <tr><td><b>Reale</b></td><td>numeri con la virgola</td><td class="mono">3.14, -0.5</td></tr>
+        <tr><td><b>Stringa</b></td><td>testo tra virgolette</td><td class="mono">"ciao"</td></tr>
+        <tr><td><b>Booleano</b></td><td>vero o falso</td><td class="mono">true, false</td></tr>
+      </table>
+      <div class="esempio"><b>💡 Attenzione al tipo!</b> Il libro avverte: per la <b>media</b> di due numeri interi usa variabili <b>Reali</b>: (5+6)/2 = 5.5 … e 5.5 non entra in una scatola per interi!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 10 : DICHIARAZIONE ============ -->
+<section class="slide">
+  <span class="badge">VARIABILI</span>
+  <h1>🏷️ Il blocco Dichiarazione</h1>
+  <div class="cols">
+    <div>
+      <p>Prima di usare una variabile bisogna <b>dichiararla</b>: comunichiamo al software nome e tipo.</p>
+      <div class="passo"><div class="num">1</div><div>Clicca sulla freccia tra <b>Inizio</b> e <b>Fine</b> e scegli <b>Dichiarazione</b>.</div></div>
+      <div class="passo"><div class="num">2</div><div>Doppio clic sul blocco: scrivi i nomi delle variabili <b>separati da virgola</b>.</div></div>
+      <div class="passo"><div class="num">3</div><div>Scegli il <b>Tipo</b> dal menu a tendina (es. Reale) e conferma con <b>OK</b>.</div></div>
+      <div class="esempio"><b>💡 Dal libro — l'esempio del rettangolo:</b><br>nella finestra Dichiarazione scriviamo<br><span class="mono">altezza, base, perimetro, area</span><br>e scegliamo tipo <b>Reale</b>: quattro variabili in un colpo solo!</div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 360 240" width="330">
+        <rect x="30" y="20" width="300" height="200" rx="10" fill="#fff" stroke="#64748b" stroke-width="2"/>
+        <rect x="30" y="20" width="300" height="36" rx="10" fill="#1e3a8a"/>
+        <text x="50" y="44" font-size="14" fill="#fff" font-weight="bold">Dichiarazione</text>
+        <text x="50" y="85" font-size="13" fill="#334155">Nome variabile/i:</text>
+        <rect x="50" y="95" width="260" height="28" rx="4" fill="#f8fafc" stroke="#94a3b8"/>
+        <text x="60" y="114" font-size="13" fill="#1e293b" font-family="Consolas">altezza, base, perimetro, area</text>
+        <text x="50" y="150" font-size="13" fill="#334155">Tipo:</text>
+        <rect x="50" y="160" width="140" height="28" rx="4" fill="#f8fafc" stroke="#f97316" stroke-width="2"/>
+        <text x="60" y="179" font-size="13" fill="#1e293b">Reale ▾</text>
+        <rect x="210" y="160" width="45 " height="28" rx="4" fill="#e2e8f0"/><text x="232" y="179" text-anchor="middle" font-size="12">OK</text>
+        <rect x="265" y="160" width="45" height="28" rx="4" fill="#e2e8f0"/><text x="287" y="179" text-anchor="middle" font-size="12">Esci</text>
+      </svg>
+      <p style="color:var(--grigio); font-size:.95em;">La finestra Dichiarazione di Flowgorithm</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 11 : SCRIVI ============ -->
+<section class="slide">
+  <span class="badge">VARIABILI</span>
+  <h1>🖨️ Il blocco Scrivi (output)</h1>
+  <div class="cols">
+    <div>
+      <p>Il blocco <b>Scrivi</b> stampa sullo schermo scritte e valori.</p>
+      <ul>
+        <li>Il testo <b>tra virgolette</b> viene stampato <b>così com'è</b>: <span class="mono">"Ciao!"</span> → Ciao!</li>
+        <li>I nomi di variabile <b>senza virgolette</b> vengono sostituiti dal loro <b>valore</b>: <span class="mono">area</span> → 128</li>
+        <li>L'operatore <span class="mono">&amp;</span> <b>concatena</b> (incolla) testi e variabili sulla stessa riga.</li>
+      </ul>
+      <div class="esempio"><b>💡 Dal libro:</b><br>
+      <span class="mono">"Perimetro: " &amp; perimetro &amp; " - Area: " &amp; area</span><br><br>
+      stampa → <b>Perimetro: 48 - Area: 128</b></div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 360 220" width="330">
+        <polygon points="70,30 310,30 280,90 40,90" fill="#86efac" stroke="#16a34a" stroke-width="3"/>
+        <text x="175" y="55" text-anchor="middle" font-size="14" fill="#14532d" font-weight="bold">Scrivi "Il doppio è " &amp; d</text>
+        <text x="175" y="75" text-anchor="middle" font-size="12" fill="#166534">(parallelogramma verde = output)</text>
+        <path d="M175 95 v30 l-8 -10 m8 10 l8 -10" stroke="#475569" stroke-width="4" fill="none"/>
+        <rect x="60" y="135" width="230" height="60" rx="8" fill="#0f172a"/>
+        <text x="80" y="172" font-size="16" fill="#4ade80" font-family="Consolas">Il doppio è 14</text>
+      </svg>
+      <div class="nota"><b>📌 Errore classico:</b> dimenticare le virgolette! <span class="mono">Scrivi Ciao</span> cerca una variabile di nome Ciao (che non esiste) e dà errore. Giusto: <span class="mono">Scrivi "Ciao"</span>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 12 : LEGGI ============ -->
+<section class="slide">
+  <span class="badge">VARIABILI</span>
+  <h1>⌨️ Il blocco Leggi (input)</h1>
+  <div class="cols">
+    <div>
+      <p>Il blocco <b>Leggi</b> ferma l'algoritmo, aspetta che l'utente digiti un valore e lo <b>memorizza in una variabile</b>.</p>
+      <p>Nel blocco va scritto <b>solo il nome della variabile</b>, ad esempio: <span class="mono">altezza</span>.</p>
+      <div class="nota"><b>📌 La coppia perfetta:</b> prima di ogni Leggi metti sempre uno <b>Scrivi</b> che spiega cosa inserire, altrimenti l'utente vede solo una casella vuota e non sa cosa fare!<br><br>
+      <span class="mono">Scrivi "Inserisci il valore dell'altezza: "</span><br>
+      <span class="mono">Leggi altezza</span></div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 360 230" width="330">
+        <polygon points="70,20 310,20 280,75 40,75" fill="#86efac" stroke="#16a34a" stroke-width="3"/>
+        <text x="175" y="53" text-anchor="middle" font-size="13" fill="#14532d" font-weight="bold">Scrivi "Inserisci l'altezza: "</text>
+        <line x1="175" y1="78" x2="175" y2="105" stroke="#475569" stroke-width="4"/>
+        <polygon points="80,105 300,105 270,160 50,160" fill="#93c5fd" stroke="#1d4ed8" stroke-width="3"/>
+        <text x="175" y="138" text-anchor="middle" font-size="14" fill="#1e3a8a" font-weight="bold">Leggi altezza</text>
+        <text x="175" y="190" text-anchor="middle" font-size="13" fill="#475569">parallelogramma azzurro = input</text>
+        <text x="175" y="215" text-anchor="middle" font-size="13" fill="#475569">l'utente digita 8 → altezza contiene 8</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 13 : ASSEGNAZIONE E OPERATORI ============ -->
+<section class="slide">
+  <span class="badge">VARIABILI</span>
+  <h1>🧮 Il blocco Assegnazione e gli operatori</h1>
+  <div class="cols">
+    <div>
+      <p>Il blocco <b>Assegnazione</b> calcola un'espressione e ne <b>memorizza il risultato</b> in una variabile:</p>
+      <div class="pseudo">base = 2*altezza
+perimetro = 2*base + 2*altezza
+area = base*altezza</div>
+      <div class="esempio"><b>💡 Può riferirsi a sé stessa!</b><br><span class="mono">num = num + 1</span> significa: "prendi il valore di num, aggiungi 1, rimettilo in num". Questo trucco è il cuore dei <b>cicli</b>.</div>
+    </div>
+    <div>
+      <h2>Gli operatori aritmetici</h2>
+      <table>
+        <tr><th>Operatore</th><th>Significato</th><th>Esempio</th></tr>
+        <tr><td class="mono">+  -  *  /</td><td>le 4 operazioni</td><td class="mono">7/2 → 3.5</td></tr>
+        <tr><td class="mono">%</td><td>resto della divisione</td><td class="mono">7%2 → 1</td></tr>
+        <tr><td class="mono">^</td><td>elevamento a potenza</td><td class="mono">3^2 → 9</td></tr>
+        <tr><td class="mono">sqrt()</td><td>radice quadrata</td><td class="mono">sqrt(16) → 4</td></tr>
+        <tr><td class="mono">random(n)</td><td>casuale tra 0 e n−1</td><td class="mono">random(10)</td></tr>
+      </table>
+      <div class="nota"><b>📌 Il % è una star:</b> serve per pari/dispari (<span class="mono">num%2==0</span> → pari), multipli, cifre… Imparalo bene!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 14 : PRIMO ALGORITMO ============ -->
+<section class="slide">
+  <span class="badge">FLOWGORITHM</span>
+  <h1>🥇 Il primo algoritmo: il rettangolo del libro</h1>
+  <p><b>Problema (dal libro):</b> un rettangolo ha la base doppia dell'altezza. Chiedi l'altezza all'utente e calcola perimetro e area.</p>
+  <div class="cols">
+    <div class="center">
+      <svg viewBox="0 0 300 420" width="260">
+        <rect x="90" y="5" width="120" height="30" rx="15" fill="#c084fc"/><text x="150" y="25" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="150" y1="35" x2="150" y2="48" stroke="#475569" stroke-width="3"/>
+        <rect x="35" y="48" width="230" height="34" fill="#fde68a" stroke="#d97706" stroke-width="2"/><text x="150" y="70" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">Dichiara altezza, base, perimetro, area: Reale</text>
+        <line x1="150" y1="82" x2="150" y2="95" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,95 265,95 245,129 35,129" fill="#86efac"/><text x="150" y="116" text-anchor="middle" font-size="11" fill="#14532d" font-weight="bold">Scrivi "Inserisci l'altezza: "</text>
+        <line x1="150" y1="129" x2="150" y2="142" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,142 265,142 245,176 35,176" fill="#93c5fd"/><text x="150" y="163" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi altezza</text>
+        <line x1="150" y1="176" x2="150" y2="189" stroke="#475569" stroke-width="3"/>
+        <rect x="55" y="189" width="190" height="30" fill="#fde68a"/><text x="150" y="209" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">base = 2*altezza</text>
+        <line x1="150" y1="219" x2="150" y2="232" stroke="#475569" stroke-width="3"/>
+        <rect x="55" y="232" width="190" height="30" fill="#fde68a"/><text x="150" y="252" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">perimetro = 2*base + 2*altezza</text>
+        <line x1="150" y1="262" x2="150" y2="275" stroke="#475569" stroke-width="3"/>
+        <rect x="55" y="275" width="190" height="30" fill="#fde68a"/><text x="150" y="295" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">area = base*altezza</text>
+        <line x1="150" y1="305" x2="150" y2="318" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,318 265,318 245,352 35,352" fill="#86efac"/><text x="150" y="333" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "Perimetro: " &amp; perimetro</text><text x="150" y="346" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">&amp; " - Area: " &amp; area</text>
+        <line x1="150" y1="352" x2="150" y2="365" stroke="#475569" stroke-width="3"/>
+        <rect x="90" y="365" width="120" height="30" rx="15" fill="#c084fc"/><text x="150" y="385" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+    </div>
+    <div>
+      <h2>Proviamolo con altezza = 8</h2>
+      <table>
+        <tr><th>Variabile</th><th>Valore</th></tr>
+        <tr><td class="mono">altezza</td><td>8</td></tr>
+        <tr><td class="mono">base</td><td>2×8 = <b>16</b></td></tr>
+        <tr><td class="mono">perimetro</td><td>2×16+2×8 = <b>48</b></td></tr>
+        <tr><td class="mono">area</td><td>16×8 = <b>128</b></td></tr>
+      </table>
+      <div class="esempio"><b>💡 Le 3 finestre utili di Flowgorithm:</b><br>
+      ▶ <b>Esecuzione</b>: si apre con il pulsante Esegui, mostra input e output<br>
+      📊 <b>Variabili</b>: mostra il valore delle variabili mentre l'algoritmo gira<br>
+      📝 <b>Codifica</b>: traduce il diagramma in pseudocodice o in un vero linguaggio!</div>
+      <div class="curiosita"><b>🔎 Ritrovi le 4 fasi?</b> Dichiarazione → input → elaborazione → output: lo schema progettuale al lavoro!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 15 : OPERATORI CONFRONTO ============ -->
+<section class="slide">
+  <span class="badge">SELEZIONE</span>
+  <h1>⚖️ Gli operatori di confronto</h1>
+  <p>Per prendere decisioni, l'algoritmo deve <b>confrontare</b> valori. Il risultato di un confronto è sempre <b>vero</b> o <b>falso</b>.</p>
+  <div class="cols">
+    <div>
+      <table>
+        <tr><th>Operatore</th><th>Significato</th><th>Esempio (num=7)</th></tr>
+        <tr><td class="mono">==</td><td>uguale a</td><td class="mono">num==7 → vero</td></tr>
+        <tr><td class="mono">!=</td><td>diverso da</td><td class="mono">num!=7 → falso</td></tr>
+        <tr><td class="mono">&gt;</td><td>maggiore</td><td class="mono">num&gt;10 → falso</td></tr>
+        <tr><td class="mono">&lt;</td><td>minore</td><td class="mono">num&lt;10 → vero</td></tr>
+        <tr><td class="mono">&gt;=</td><td>maggiore o uguale</td><td class="mono">num&gt;=7 → vero</td></tr>
+        <tr><td class="mono">&lt;=</td><td>minore o uguale</td><td class="mono">num&lt;=6 → falso</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="nota" style="font-size:1.1em;"><b>📌 ATTENZIONE — l'errore più frequente dell'anno!</b><br><br>
+      <span class="mono">=</span> &nbsp;(uno solo) → <b>assegna</b>: <span class="mono">num=2</span> mette 2 dentro num<br><br>
+      <span class="mono">==</span> (doppio) → <b>controlla</b>: <span class="mono">SE (num==2)</span> chiede "num contiene 2?"</div>
+      <div class="esempio"><b>💡 Trucco per ricordare:</b> il confronto è una domanda, e le domande… richiedono più impegno: due segni invece di uno! 😄</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 16 : COSTRUTTO DI SELEZIONE ============ -->
+<section class="slide">
+  <span class="badge">SELEZIONE</span>
+  <h1>🔀 Il costrutto di selezione</h1>
+  <p><b>Definizione (dal libro):</b> il costrutto di selezione è una struttura di controllo che, in base al verificarsi o meno di una <b>condizione</b>, indica la sequenza di passi da eseguire.</p>
+  <div class="cols">
+    <div>
+      <h2>In pseudocodice</h2>
+      <div class="pseudo"><b>SE</b> condizione <b>ALLORA</b>
+   istruzioni se la condizione è vera
+<b>ALTRIMENTI</b>
+   istruzioni se la condizione è falsa
+<b>FINE SE</b></div>
+      <p>In inglese: <span class="mono">IF … THEN … ELSE … END IF</span>. La parte <b>ALTRIMENTI</b> è facoltativa.</p>
+      <div class="nota"><b>📌 Indentazione:</b> le istruzioni interne si scrivono <b>spostate a destra</b>: rende l'algoritmo molto più leggibile. Abituati subito!</div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 440 340" width="400">
+        <!-- freccia in ingresso -->
+        <line x1="220" y1="10" x2="220" y2="45" stroke="#475569" stroke-width="4"/>
+        <path d="M212 37 l8 10 l8 -10" stroke="#475569" stroke-width="4" fill="none"/>
+        <!-- rombo -->
+        <polygon points="220,50 320,105 220,160 120,105" fill="#fda4af" stroke="#dc2626" stroke-width="3"/>
+        <text x="220" y="112" text-anchor="middle" font-size="18" fill="#7f1d1d" font-weight="bold">condizione?</text>
+        <!-- ramo VERO (destra) -->
+        <line x1="320" y1="105" x2="360" y2="105" stroke="#475569" stroke-width="4"/>
+        <line x1="360" y1="105" x2="360" y2="185" stroke="#475569" stroke-width="4"/>
+        <path d="M352 177 l8 10 l8 -10" stroke="#475569" stroke-width="4" fill="none"/>
+        <text x="342" y="92" text-anchor="middle" font-size="16" fill="#16a34a" font-weight="bold">Vero</text>
+        <rect x="285" y="190" width="150" height="46" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+        <text x="360" y="219" text-anchor="middle" font-size="16" fill="#14532d" font-weight="bold">istruzioni A</text>
+        <!-- ramo FALSO (sinistra) -->
+        <line x1="120" y1="105" x2="80" y2="105" stroke="#475569" stroke-width="4"/>
+        <line x1="80" y1="105" x2="80" y2="185" stroke="#475569" stroke-width="4"/>
+        <path d="M72 177 l8 10 l8 -10" stroke="#475569" stroke-width="4" fill="none"/>
+        <text x="98" y="92" text-anchor="middle" font-size="16" fill="#dc2626" font-weight="bold">Falso</text>
+        <rect x="5" y="190" width="150" height="46" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
+        <text x="80" y="219" text-anchor="middle" font-size="16" fill="#7f1d1d" font-weight="bold">istruzioni B</text>
+        <!-- ricongiungimento -->
+        <line x1="360" y1="236" x2="360" y2="275" stroke="#475569" stroke-width="4"/>
+        <line x1="80" y1="236" x2="80" y2="275" stroke="#475569" stroke-width="4"/>
+        <line x1="80" y1="275" x2="360" y2="275" stroke="#475569" stroke-width="4"/>
+        <circle cx="220" cy="275" r="9" fill="#f97316"/>
+        <line x1="220" y1="284" x2="220" y2="320" stroke="#475569" stroke-width="4"/>
+        <path d="M212 312 l8 10 l8 -10" stroke="#475569" stroke-width="4" fill="none"/>
+      </svg>
+      <p style="color:var(--grigio); font-size:.95em;">Il rombo divide il flusso in due strade che poi si ricongiungono</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 17 : ESEMPIO PARI/DISPARI ============ -->
+<section class="slide">
+  <span class="badge">SELEZIONE</span>
+  <h1>✳️ Esercizio svolto: pari o dispari?</h1>
+  <p><b>Problema (dal libro):</b> chiedi un numero all'utente e stabilisci se è pari o dispari.</p>
+  <div class="cols">
+    <div>
+      <h2>L'idea</h2>
+      <p>Un numero è <b>pari</b> se il resto della divisione per 2 è zero: <span class="mono">(num%2)==0</span>.</p>
+      <div class="pseudo"><b>INIZIO</b>
+  <b>DICHIARA</b> num
+  <b>SCRIVI</b> "Inserisci un numero: "
+  <b>LEGGI</b> num
+  <b>SE</b> (num%2==0) <b>ALLORA</b>
+    <b>SCRIVI</b> "Il numero inserito è pari"
+  <b>ALTRIMENTI</b>
+    <b>SCRIVI</b> "Il numero inserito è dispari"
+  <b>FINE SE</b>
+<b>FINE</b></div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 380 360" width="340">
+        <rect x="130" y="5" width="120" height="28" rx="14" fill="#c084fc"/><text x="190" y="24" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="190" y1="33" x2="190" y2="46" stroke="#475569" stroke-width="3"/>
+        <rect x="105" y="46" width="170" height="28" fill="#fde68a" stroke="#d97706"/><text x="190" y="65" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">Dichiara num: Intero</text>
+        <line x1="190" y1="74" x2="190" y2="87" stroke="#475569" stroke-width="3"/>
+        <polygon points="105,87 275,87 258,117 88,117" fill="#86efac"/><text x="190" y="106" text-anchor="middle" font-size="11" fill="#14532d" font-weight="bold">Scrivi "Inserisci un numero: "</text>
+        <line x1="190" y1="117" x2="190" y2="130" stroke="#475569" stroke-width="3"/>
+        <polygon points="120,130 260,130 245,158 105,158" fill="#93c5fd"/><text x="190" y="149" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi num</text>
+        <line x1="190" y1="158" x2="190" y2="175" stroke="#475569" stroke-width="3"/>
+        <polygon points="190,175 265,215 190,255 115,215" fill="#fda4af" stroke="#dc2626" stroke-width="2"/>
+        <text x="190" y="221" text-anchor="middle" font-size="12" fill="#7f1d1d" font-weight="bold">(num%2)==0</text>
+        <line x1="115" y1="215" x2="45" y2="215" stroke="#475569" stroke-width="3"/><text x="80" y="204" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="bold">Falso</text>
+        <line x1="45" y1="215" x2="45" y2="265" stroke="#475569" stroke-width="3"/>
+        <polygon points="5,265 95,265 85,300 -5,300" fill="#86efac" transform="translate(5 0)"/><text x="50" y="287" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "dispari"</text>
+        <line x1="265" y1="215" x2="335" y2="215" stroke="#475569" stroke-width="3"/><text x="300" y="204" text-anchor="middle" font-size="11" fill="#16a34a" font-weight="bold">Vero</text>
+        <line x1="335" y1="215" x2="335" y2="265" stroke="#475569" stroke-width="3"/>
+        <polygon points="295,265 385,265 375,300 285,300" fill="#86efac"/><text x="337" y="287" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "pari"</text>
+        <line x1="50" y1="300" x2="50" y2="320" stroke="#475569" stroke-width="3"/><line x1="335" y1="300" x2="335" y2="320" stroke="#475569" stroke-width="3"/>
+        <line x1="50" y1="320" x2="335" y2="320" stroke="#475569" stroke-width="3"/>
+        <circle cx="190" cy="320" r="6" fill="#f97316"/>
+        <line x1="190" y1="326" x2="190" y2="336" stroke="#475569" stroke-width="3"/>
+        <rect x="130" y="336" width="120" height="24" rx="12" fill="#c084fc"/><text x="190" y="353" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 18 : SE ANNIDATI ============ -->
+<section class="slide">
+  <span class="badge">SELEZIONE</span>
+  <h1>🪆 I SE annidati</h1>
+  <p>Quando le possibilità sono <b>più di due</b>, si mette un SE <b>dentro</b> un altro SE, come le matrioske.</p>
+  <div class="cols">
+    <div>
+      <p><b>Problema (dal libro):</b> stabilisci se un numero è: <b>minore di 0</b>, <b>compreso tra 0 e 100</b> (estremi inclusi), oppure <b>maggiore di 100</b>.</p>
+      <div class="pseudo"><b>SE</b> (num&gt;=0) <b>ALLORA</b>
+   <b>SE</b> (num&gt;100) <b>ALLORA</b>
+      <b>SCRIVI</b> "maggiore di 100"
+   <b>ALTRIMENTI</b>
+      <b>SCRIVI</b> "tra 0 e 100"
+   <b>FINE SE</b>
+<b>ALTRIMENTI</b>
+   <b>SCRIVI</b> "minore di 0"
+<b>FINE SE</b></div>
+    </div>
+    <div>
+      <h2>Come ragiona l'algoritmo</h2>
+      <div class="passo"><div class="num">1</div><div><b>Prima condizione</b> <span class="mono">num&gt;=0</span>: se è <b>falsa</b>, il numero è negativo. Caso chiuso!</div></div>
+      <div class="passo"><div class="num">2</div><div>Se è <b>vera</b>, il numero è almeno 0: serve un <b>secondo controllo</b> (annidato) <span class="mono">num&gt;100</span>.</div></div>
+      <div class="passo"><div class="num">3</div><div>Il secondo SE separa gli ultimi due casi: "tra 0 e 100" oppure "maggiore di 100".</div></div>
+      <div class="esempio"><b>💡 Prova a mente:</b> num = 42 → num&gt;=0? vero → num&gt;100? falso → stampa <b>"tra 0 e 100"</b> ✓</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 19 : CONNETTIVO E (AND) ============ -->
+<section class="slide">
+  <span class="badge">CONNETTIVI LOGICI</span>
+  <h1>🔗 La congiunzione logica: E (AND)</h1>
+  <div class="cols">
+    <div>
+      <p>A volte servono <b>due condizioni contemporaneamente</b>. Il connettivo <b>E</b> (in inglese <b>AND</b>, simbolo <span class="mono">&amp;&amp;</span>) è vero <b>solo se entrambe sono vere</b>.</p>
+      <div class="esempio"><b>💡 Nella vita reale:</b> "Se piove <b>E</b> devo uscire, prendo l'ombrello". Se non piove, o se resto a casa… niente ombrello!</div>
+      <p><b>Dal libro</b> — invece di due SE annidati:</p>
+      <div class="pseudo"><b>SE</b> ((num&gt;=10) <b>E</b> (num&lt;=50)) <b>ALLORA</b>
+   <b>SCRIVI</b> "num è compreso tra 10 e 50"
+<b>FINE SE</b></div>
+      <p>Più <b>compatto</b> ed elegante dei SE annidati!</p>
+    </div>
+    <div>
+      <h2>Tabella di verità dell'E (AND)</h2>
+      <table>
+        <tr><th>A</th><th>B</th><th>A E B</th></tr>
+        <tr><td>vera</td><td>vera</td><td style="background:#dcfce7;"><b>vera</b></td></tr>
+        <tr><td>vera</td><td>falsa</td><td style="background:#fee2e2;">falsa</td></tr>
+        <tr><td>falsa</td><td>vera</td><td style="background:#fee2e2;">falsa</td></tr>
+        <tr><td>falsa</td><td>falsa</td><td style="background:#fee2e2;">falsa</td></tr>
+      </table>
+      <div class="nota"><b>📌 Da ricordare:</b> con l'AND basta <b>una condizione falsa</b> per rendere falso tutto. È il connettivo "severo": vuole tutto vero!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 20 : CONNETTIVO O (OR) ============ -->
+<section class="slide">
+  <span class="badge">CONNETTIVI LOGICI</span>
+  <h1>🔗 La disgiunzione inclusiva: O (OR)</h1>
+  <div class="cols">
+    <div>
+      <p>Il connettivo <b>O</b> (in inglese <b>OR</b>, simbolo <span class="mono">||</span>) è vero se <b>almeno una</b> delle condizioni è vera.</p>
+      <div class="esempio"><b>💡 Nella vita reale:</b> "Se ti piace l'informatica <b>O</b> la matematica, puoi seguire il corso". Basta una delle due passioni!</div>
+      <p><b>Esercizio svolto (dal libro):</b> dati due voti, stampa "Eccellente!" se <b>almeno uno</b> è ≥ 9:</p>
+      <div class="pseudo"><b>SE</b> ((voto1&gt;=9) <b>O</b> (voto2&gt;=9)) <b>ALLORA</b>
+   <b>SCRIVI</b> "Eccellente!"
+<b>FINE SE</b></div>
+    </div>
+    <div>
+      <h2>Tabella di verità dell'O (OR)</h2>
+      <table>
+        <tr><th>A</th><th>B</th><th>A O B</th></tr>
+        <tr><td>vera</td><td>vera</td><td style="background:#dcfce7;"><b>vera</b></td></tr>
+        <tr><td>vera</td><td>falsa</td><td style="background:#dcfce7;"><b>vera</b></td></tr>
+        <tr><td>falsa</td><td>vera</td><td style="background:#dcfce7;"><b>vera</b></td></tr>
+        <tr><td>falsa</td><td>falsa</td><td style="background:#fee2e2;">falsa</td></tr>
+      </table>
+      <div class="nota"><b>📌 Confronto rapido:</b><br><b>E</b> = severo: vuole <b>tutte</b> le condizioni vere<br><b>O</b> = generoso: gliene basta <b>una</b> vera</div>
+      <div class="curiosita"><b>🔎 Algebra booleana:</b> il ramo della matematica dove le variabili valgono solo vero/falso (1/0). L'hai già incontrata… nel binario del primo anno!</div>
+    </div>
+  </div>
+</section>
+<!-- ============ SLIDE 21 : CICLO FOR ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>🔁 Il ciclo FOR (blocco "Per")</h1>
+  <div class="cols">
+    <div>
+      <p>Quando sai <b>quante volte</b> ripetere, usa il <b>ciclo FOR</b>: ha un <b>contatore</b> che si aggiorna <b>da solo</b> a ogni giro.</p>
+      <div class="pseudo"><b>PER</b> contatore <b>DA</b> valore1 <b>A</b> valore2 (<b>PASSO</b> valore3)
+   istruzioni
+<b>FINE PER</b></div>
+      <p><b>Esempio (dal libro):</b> stampare i primi 5 numeri interi:</p>
+      <div class="pseudo"><b>PER</b> i <b>DA</b> 1 <b>A</b> 5
+   <b>SCRIVI</b> i
+<b>FINE PER</b></div>
+      <p>Output: 1 2 3 4 5 — con sole 3 righe invece di 5 SCRIVI!</p>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 340 330" width="300">
+        <rect x="110" y="5" width="120" height="30" rx="15" fill="#c084fc"/><text x="170" y="25" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="170" y1="35" x2="170" y2="50" stroke="#475569" stroke-width="3"/>
+        <rect x="85" y="50" width="170" height="30" fill="#fde68a" stroke="#d97706"/><text x="170" y="70" text-anchor="middle" font-size="12" fill="#78350f" font-weight="bold">Dichiara i: Intero</text>
+        <line x1="170" y1="80" x2="170" y2="97" stroke="#475569" stroke-width="3"/>
+        <polygon points="110,97 230,97 250,124 230,151 110,151 90,124" fill="#fdba74" stroke="#ea580c" stroke-width="3"/>
+        <text x="170" y="130" text-anchor="middle" font-size="14" fill="#7c2d12" font-weight="bold">i = 1 a 5</text>
+        <line x1="170" y1="151" x2="170" y2="175" stroke="#475569" stroke-width="3"/>
+        <text x="140" y="170" text-anchor="middle" font-size="11" fill="#475569">corpo</text>
+        <polygon points="105,175 235,175 220,210 90,210" fill="#86efac" stroke="#16a34a" stroke-width="2"/>
+        <text x="163" y="197" text-anchor="middle" font-size="13" fill="#14532d" font-weight="bold">Scrivi i</text>
+        <path d="M163 210 v25 h147 v-111 h-58" stroke="#ea580c" stroke-width="3" fill="none"/>
+        <text x="290" y="170" text-anchor="middle" font-size="11" fill="#ea580c" font-weight="bold">Ripeti</text>
+        <line x1="90" y1="124" x2="45" y2="124" stroke="#475569" stroke-width="3"/>
+        <text x="66" y="112" text-anchor="middle" font-size="11" fill="#475569" font-weight="bold">Termina</text>
+        <line x1="45" y1="124" x2="45" y2="265" stroke="#475569" stroke-width="3"/><line x1="45" y1="265" x2="170" y2="265" stroke="#475569" stroke-width="3"/>
+        <line x1="170" y1="265" x2="170" y2="285" stroke="#475569" stroke-width="3"/>
+        <rect x="110" y="285" width="120" height="30" rx="15" fill="#c084fc"/><text x="170" y="305" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+      <div class="nota"><b>📌 ATTENZIONE (dal libro):</b> non confondere la lettera <b>i</b> con il numero <b>1</b>: è un errore molto frequente!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 22 : FOR ESEMPIO PARI ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>🔁 Esercizio svolto: i primi 10 numeri pari</h1>
+  <p><b>Problema (dal libro):</b> scrivi un algoritmo che stampi i primi 10 numeri pari. Niente input: fa tutto il ciclo!</p>
+  <div class="cols">
+    <div>
+      <h2>L'idea furba</h2>
+      <p>Se <span class="mono">i</span> assume i valori 0, 1, 2, … 9, allora <span class="mono">2*i</span> vale 0, 2, 4, … 18: ecco i pari!</p>
+      <div class="pseudo"><b>PER</b> i <b>DA</b> 0 <b>A</b> 9
+   <b>SCRIVI</b> 2*i
+<b>FINE PER</b></div>
+      <table>
+        <tr><th>giro</th><td>1°</td><td>2°</td><td>3°</td><td>…</td><td>10°</td></tr>
+        <tr><th class="mono">i</th><td>0</td><td>1</td><td>2</td><td>…</td><td>9</td></tr>
+        <tr><th class="mono">2*i</th><td><b>0</b></td><td><b>2</b></td><td><b>4</b></td><td>…</td><td><b>18</b></td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>Come finisce il ciclo?</h2>
+      <p>Il procedimento continua finché <span class="mono">i</span> diventa 10: essendo <b>fuori</b> dall'intervallo 0–9, si esce dal ciclo e il programma termina.</p>
+      <div class="esempio"><b>💡 Il PASSO:</b> puoi anche contare di 2 in 2! <br><span class="mono">PER i DA 2 A 20 PASSO 2 → SCRIVI i</span><br>stampa 2, 4, 6, … 20: stesso risultato, strada diversa.</div>
+      <div class="curiosita"><b>🔎 Sfida:</b> come stamperesti la tabellina del 7 con un FOR? <br>(<span class="mono">PER i DA 1 A 10 → SCRIVI 7*i</span>… facile, no?)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 23 : CICLO WHILE ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>🔄 Il ciclo WHILE (blocco "Mentre")</h1>
+  <div class="cols">
+    <div>
+      <p>Quando <b>non sai in anticipo quante volte</b> ripetere, usa il <b>WHILE</b>: ripete <b>finché una condizione è vera</b>, controllandola <b>all'inizio</b> di ogni giro.</p>
+      <div class="pseudo"><b>MENTRE</b> condizione
+   istruzioni
+<b>FINE MENTRE</b></div>
+      <p><b>Esempio:</b> stampare i numeri da 0 a 9:</p>
+      <div class="pseudo">num = 0
+<b>MENTRE</b> num&lt;10
+   <b>SCRIVI</b> num
+   num = num+1
+<b>FINE MENTRE</b></div>
+    </div>
+    <div>
+      <h2>FOR o WHILE?</h2>
+      <table>
+        <tr><th></th><th>FOR (Per)</th><th>WHILE (Mentre)</th></tr>
+        <tr><td><b>Quante volte?</b></td><td>lo so già</td><td>non lo so</td></tr>
+        <tr><td><b>Contatore</b></td><td>automatico</td><td>lo aggiorno io!</td></tr>
+        <tr><td><b>Esempio tipico</b></td><td>"stampa 10 numeri"</td><td>"chiedi finché non indovina"</td></tr>
+      </table>
+      <div class="curiosita"><b>🔎 Dal libro:</b> FOR e WHILE sono <b>equivalenti</b>: ciò che fai con uno puoi farlo con l'altro. Ma a seconda del problema, uno dei due è più comodo!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 24 : CICLO INFINITO ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>♾️ Il pericolo n°1: il ciclo infinito</h1>
+  <div class="cols">
+    <div>
+      <p><b>Dal libro:</b> a differenza del FOR, nel WHILE <b>non c'è un contatore che si aggiorna da solo</b>. Se dimentichi di aggiornarlo… il ciclo non finisce mai!</p>
+      <div class="pseudo" style="border-color:#dc2626; background:#fef2f2;">num = 0
+<b>MENTRE</b> num&lt;10
+   <b>SCRIVI</b> num     ⚠️ num resta 0
+<b>FINE MENTRE</b>       per sempre!</div>
+      <p class="center" style="font-size:1.6em;">😱 0 0 0 0 0 0 0 0 0 0 0 0 0 …</p>
+    </div>
+    <div>
+      <p>La cura: <b>modificare la variabile dentro il ciclo</b>, così prima o poi la condizione diventa falsa.</p>
+      <div class="pseudo" style="border-color:#16a34a; background:#f0fdf4;">num = 0
+<b>MENTRE</b> num&lt;10
+   <b>SCRIVI</b> num
+   num = num+1   ✅ ora cresce!
+<b>FINE MENTRE</b></div>
+      <p class="center" style="font-size:1.3em;">😌 0 1 2 3 4 5 6 7 8 9 — e si ferma.</p>
+      <div class="nota"><b>📌 Check-list anti-ciclo-infinito:</b> 1) la condizione può diventare falsa? 2) qualcosa cambia dentro il ciclo? Se rispondi due volte "sì", sei al sicuro.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 25 : DO-WHILE ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>🔂 Il ciclo DO-WHILE (blocco "Fai")</h1>
+  <div class="cols">
+    <div>
+      <p>Il <b>DO-WHILE</b> è il fratello del WHILE, ma controlla la condizione <b>alla fine</b> del giro: il corpo viene eseguito <b>almeno una volta</b>, sempre.</p>
+      <div class="pseudo"><b>FAI</b>
+   istruzioni
+<b>MENTRE</b> condizione</div>
+      <div class="esempio"><b>💡 Quando usarlo?</b> Quando l'azione va fatta comunque almeno una volta prima di poter decidere. Esempio: chiedere un numero e ripetere la richiesta <b>finché</b> non è valido — la prima richiesta ci vuole per forza!</div>
+    </div>
+    <div>
+      <h2>WHILE vs DO-WHILE</h2>
+      <svg viewBox="0 0 400 210" width="380">
+        <text x="100" y="20" text-anchor="middle" font-size="14" fill="#1e3a8a" font-weight="bold">MENTRE (while)</text>
+        <polygon points="100,35 155,65 100,95 45,65" fill="#fda4af" stroke="#dc2626" stroke-width="2"/>
+        <text x="100" y="70" text-anchor="middle" font-size="11" fill="#7f1d1d" font-weight="bold">condizione?</text>
+        <rect x="55" y="115" width="90" height="34" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <text x="100" y="137" text-anchor="middle" font-size="11" fill="#14532d" font-weight="bold">corpo</text>
+        <path d="M100 95 v20" stroke="#475569" stroke-width="3"/>
+        <path d="M100 149 v20 h75 v-104 h-15" stroke="#475569" stroke-width="2.5" fill="none"/>
+        <text x="100" y="195" text-anchor="middle" font-size="11" fill="#475569">controlla PRIMA → corpo anche 0 volte</text>
+        <text x="300" y="20" text-anchor="middle" font-size="14" fill="#1e3a8a" font-weight="bold">FAI (do-while)</text>
+        <rect x="255" y="35" width="90" height="34" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <text x="300" y="57" text-anchor="middle" font-size="11" fill="#14532d" font-weight="bold">corpo</text>
+        <polygon points="300,90 355,120 300,150 245,120" fill="#fda4af" stroke="#dc2626" stroke-width="2"/>
+        <text x="300" y="125" text-anchor="middle" font-size="11" fill="#7f1d1d" font-weight="bold">condizione?</text>
+        <path d="M300 69 v21" stroke="#475569" stroke-width="3"/>
+        <path d="M355 120 h25 v-68 h-33" stroke="#475569" stroke-width="2.5" fill="none"/>
+        <text x="300" y="195" text-anchor="middle" font-size="11" fill="#475569">controlla DOPO → corpo almeno 1 volta</text>
+      </svg>
+      <div class="nota"><b>📌 In Flowgorithm:</b> il while si realizza con il blocco <b>Mentre</b>, il do-while con il blocco <b>Fai</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 26 : ESEMPIO TABELLINA ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>✖️ Dalla nostra cartella: la tabellina del 7 con WHILE</h1>
+  <p>Questo esempio è il file <span class="mono">tabellina7_while.fprg</span> della cartella di classe:</p>
+  <div class="cols">
+    <div>
+      <div class="pseudo"><b>DICHIARA</b> num: Intero
+num = 7
+<b>MENTRE</b> num&lt;=70
+   <b>SCRIVI</b> num
+   num = num+7
+<b>FINE MENTRE</b></div>
+      <p>Output: <b>7 14 21 28 35 42 49 56 63 70</b></p>
+      <div class="esempio"><b>💡 Segui il flusso:</b> num parte da 7 → 7≤70? sì, stampa 7, num diventa 14 → 14≤70? sì… → quando num arriva a 77, 77≤70 è <b>falso</b>: fine!</div>
+    </div>
+    <div>
+      <h2>Stesso problema, altro ciclo</h2>
+      <p>Nella cartella trovi anche <span class="mono">tabellina7_dowhile.fprg</span> (con il blocco Fai) e <span class="mono">tabellina__8.fprg</span>. Confrontali: stesso risultato, costrutti diversi!</p>
+      <div class="curiosita"><b>🔎 Un altro file interessante:</b> <span class="mono">WHILE_INSERISCI_NUMERI_FINO_AL_DISPARI.fprg</span> — continua a chiedere numeri finché non inserisci un <b>dispari</b>. La condizione è <span class="mono">num%2==0</span>: finché inserisci pari, si ricomincia. È il classico ciclo "a sentinella"!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 27 : RIEPILOGO COSTRUTTI ============ -->
+<section class="slide">
+  <span class="badge">I CICLI</span>
+  <h1>🧭 Riepilogo: quale costrutto scelgo?</h1>
+  <table style="font-size:1.08em;">
+    <tr><th>Situazione</th><th>Costrutto</th><th>Blocco Flowgorithm</th></tr>
+    <tr><td>Istruzioni una dopo l'altra, senza scelte</td><td><b>Sequenza</b></td><td>Dichiarazione, Leggi, Scrivi, Assegnazione</td></tr>
+    <tr><td>Devo scegliere tra due strade</td><td><b>Selezione</b></td><td>Se (rombo)</td></tr>
+    <tr><td>Più di due casi possibili</td><td><b>SE annidati</b></td><td>Se dentro Se</td></tr>
+    <tr><td>Due condizioni insieme / almeno una</td><td><b>E</b> (AND) / <b>O</b> (OR)</td><td>dentro la condizione del Se</td></tr>
+    <tr><td>Ripetere un numero noto di volte</td><td><b>FOR</b></td><td>Per (esagono)</td></tr>
+    <tr><td>Ripetere finché vale una condizione</td><td><b>WHILE</b></td><td>Mentre (esagono)</td></tr>
+    <tr><td>Come while, ma almeno un'esecuzione</td><td><b>DO-WHILE</b></td><td>Fai (esagono)</td></tr>
+  </table>
+  <div class="nota"><b>📌 Teorema di Böhm-Jacopini (per i curiosi):</b> con soli tre costrutti — <b>sequenza</b>, <b>selezione</b> e <b>ripetizione</b> — si può scrivere <b>qualsiasi</b> algoritmo. Tutta l'informatica sta in queste tre mosse!</div>
+</section>
+<!-- ============ SLIDE 28 : ESERCIZI SEMPLICI DAL LIBRO ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI</span>
+  <h1>📖 Gli esercizi più semplici del libro (Check)</h1>
+  <p>Ecco gli esercizi <b>più semplici</b> estratti dalle sezioni <b>Check</b> del libro, in ordine di difficoltà. Prima di aprire Flowgorithm, imposta le 4 fasi sul quaderno!</p>
+  <div class="cols">
+    <div>
+      <div class="box" style="border-top:6px solid #eab308;"><h2>🟡 Sequenza (facilissimi)</h2>
+      <ol>
+        <li>Dati in ingresso <b>tre valori interi</b>, restituisci la <b>somma</b>.</li>
+        <li>Dati in ingresso <b>due valori interi</b>, restituisci la <b>media</b>. <i>(attenzione al tipo Reale!)</i></li>
+        <li>Data la misura del lato di un quadrato, restituisci la <b>diagonale</b>. <i>(serve sqrt!)</i></li>
+      </ol></div>
+      <div class="box" style="border-top:6px solid #dc2626;"><h2>🔴 Selezione</h2>
+      <ol>
+        <li>Dati <b>due numeri interi</b> distinti, restituisci il <b>maggiore</b>.</li>
+        <li>Dati due numeri, restituisci il maggiore <b>se il primo è pari</b>, altrimenti il minore.</li>
+        <li>Dati <b>tre numeri</b> distinti, restituisci il <b>maggiore</b>. <i>(SE annidati!)</i></li>
+      </ol></div>
+    </div>
+    <div>
+      <div class="box" style="border-top:6px solid #ea580c;"><h2>🟠 Cicli</h2>
+      <ol>
+        <li>Stampa tutti i numeri interi <b>tra 10 e 20</b>.</li>
+        <li>Stampa tutti i numeri <b>pari tra 1 e 50</b>.</li>
+        <li>Stampa i <b>primi 10 numeri dispari</b>.</li>
+        <li>Dato un numero <i>num</i>, stampa i <b>primi num numeri pari</b>.</li>
+        <li>Dato in ingresso <i>num</i>, stampa in ordine <b>decrescente</b> i valori da <i>num</i> a 0.</li>
+      </ol></div>
+      <div class="nota"><b>📌 Metodo per ogni esercizio:</b> 1) quali variabili e di che tipo? 2) quali input? 3) quale calcolo o costrutto? 4) quale output? Poi disegna, esegui e <b>prova con numeri facili</b> per verificare.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 29 : ESERCIZI INTERATTIVI 1 ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI</span>
+  <h1>✏️ Esercizi interattivi: leggi l'algoritmo</h1>
+  <p>Rispondi e premi <b>Verifica</b>. Fai il calcolo sul quaderno prima di rispondere!</p>
+  <div class="eser"><span class="dom">1) <span class="mono">num=9</span> → quanto vale <span class="mono">num%2</span>?</span><input id="a1"><button onclick="verifica('a1','1','fa1')">Verifica</button><span class="fb" id="fa1"></span></div>
+  <div class="eser"><span class="dom">2) <span class="mono">PER i DA 1 A 6 → SCRIVI i</span> — quante volte viene eseguito SCRIVI?</span><input id="a2"><button onclick="verifica('a2','6','fa2')">Verifica</button><span class="fb" id="fa2"></span></div>
+  <div class="eser"><span class="dom">3) <span class="mono">PER i DA 0 A 4 → SCRIVI 2*i</span> — qual è l'<b>ultimo</b> numero stampato?</span><input id="a3"><button onclick="verifica('a3','8','fa3')">Verifica</button><span class="fb" id="fa3"></span></div>
+  <div class="eser"><span class="dom">4) <span class="mono">altezza=5</span>, <span class="mono">base=2*altezza</span>, <span class="mono">area=base*altezza</span> → quanto vale area?</span><input id="a4"><button onclick="verifica('a4','50','fa4')">Verifica</button><span class="fb" id="fa4"></span></div>
+  <div class="eser"><span class="dom">5) <span class="mono">num=7</span> → dopo <span class="mono">num=num+1</span> ripetuto 3 volte, quanto vale num?</span><input id="a5"><button onclick="verifica('a5','10','fa5')">Verifica</button><span class="fb" id="fa5"></span></div>
+  <div class="eser"><span class="dom">6) Quale operatore "incolla" testo e variabili nello Scrivi?</span><input id="a6" placeholder="simbolo"><button onclick="verifica('a6','&','fa6')">Verifica</button><span class="fb" id="fa6"></span></div>
+</section>
+
+<!-- ============ SLIDE 30 : ESERCIZI INTERATTIVI 2 ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI</span>
+  <h1>✏️ Esercizi interattivi: vero o falso?</h1>
+  <p>Valuta le condizioni con <span class="mono">a=8</span> e <span class="mono">b=3</span>. Scrivi <b>vero</b> oppure <b>falso</b>.</p>
+  <div class="eser"><span class="dom">1) <span class="mono">a&gt;b</span></span><input id="b1" placeholder="vero/falso"><button onclick="verifica('b1','vero','fb1')">Verifica</button><span class="fb" id="fb1"></span></div>
+  <div class="eser"><span class="dom">2) <span class="mono">a%2==0</span></span><input id="b2" placeholder="vero/falso"><button onclick="verifica('b2','vero','fb2')">Verifica</button><span class="fb" id="fb2"></span></div>
+  <div class="eser"><span class="dom">3) <span class="mono">(a&gt;5) E (b&gt;5)</span></span><input id="b3" placeholder="vero/falso"><button onclick="verifica('b3','falso','fb3')">Verifica</button><span class="fb" id="fb3"></span></div>
+  <div class="eser"><span class="dom">4) <span class="mono">(a&gt;5) O (b&gt;5)</span></span><input id="b4" placeholder="vero/falso"><button onclick="verifica('b4','vero','fb4')">Verifica</button><span class="fb" id="fb4"></span></div>
+  <div class="eser"><span class="dom">5) <span class="mono">(a==8) E (b!=3)</span></span><input id="b5" placeholder="vero/falso"><button onclick="verifica('b5','falso','fb5')">Verifica</button><span class="fb" id="fb5"></span></div>
+  <div class="nota"><b>📌 Ricorda:</b> l'<b>E</b> vuole tutte le condizioni vere, all'<b>O</b> ne basta una. E il doppio uguale <span class="mono">==</span> è una domanda, non un'assegnazione!</div>
+</section>
+
+<!-- ============ SLIDE 31 : QUIZ ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI</span>
+  <h1>🎯 Quiz sui costrutti</h1>
+  <div class="cols">
+    <div>
+      <div class="quiz">
+        <p>1) Quale blocco usi per ricevere un valore dall'utente?</p>
+        <label onclick="quizRispondi(this,false)">Scrivi</label>
+        <label onclick="quizRispondi(this,true)" data-ok>Leggi</label>
+        <label onclick="quizRispondi(this,false)">Assegnazione</label>
+      </div>
+      <div class="quiz">
+        <p>2) Il rombo nel diagramma di flusso rappresenta…</p>
+        <label onclick="quizRispondi(this,false)">un ciclo</label>
+        <label onclick="quizRispondi(this,false)">un output</label>
+        <label onclick="quizRispondi(this,true)" data-ok>una decisione (selezione)</label>
+      </div>
+      <div class="quiz">
+        <p>3) "Chiedi la password finché non è giusta": quale ciclo è più adatto?</p>
+        <label onclick="quizRispondi(this,true)" data-ok>DO-WHILE (Fai): almeno un tentativo serve sempre</label>
+        <label onclick="quizRispondi(this,false)">FOR: so già quante volte</label>
+        <label onclick="quizRispondi(this,false)">Nessun ciclo</label>
+      </div>
+    </div>
+    <div>
+      <div class="quiz">
+        <p>4) Cosa provoca un ciclo infinito nel WHILE?</p>
+        <label onclick="quizRispondi(this,false)">Usare troppe variabili</label>
+        <label onclick="quizRispondi(this,true)" data-ok>Non modificare mai la variabile della condizione</label>
+        <label onclick="quizRispondi(this,false)">Scrivere la condizione con ==</label>
+      </div>
+      <div class="quiz">
+        <p>5) <span class="mono">SE (num==2)</span> significa…</p>
+        <label onclick="quizRispondi(this,false)">metti 2 dentro num</label>
+        <label onclick="quizRispondi(this,true)" data-ok>controlla se num contiene 2</label>
+        <label onclick="quizRispondi(this,false)">somma 2 a num</label>
+      </div>
+      <div class="quiz">
+        <p>6) Per stampare i primi 100 numeri, il costrutto più comodo è…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>FOR: il numero di ripetizioni è noto</label>
+        <label onclick="quizRispondi(this,false)">SE annidati</label>
+        <label onclick="quizRispondi(this,false)">100 blocchi Scrivi</label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 32 : GUIDA FILE FPRG ============ -->
+<section class="slide">
+  <span class="badge">FILE DI LAVORO</span>
+  <h1>📂 Guida: scaricare e aprire gli esercizi (.fprg)</h1>
+  <div class="cols">
+    <div>
+      <p>Gli esercizi svolti in classe sono file <b>.fprg</b> (il formato di Flowgorithm) nella <b>cartella di classe FLOWGORITHM-FILES</b> fornita dal docente.</p>
+      <div class="passo"><div class="num">1</div><div><b>Scarica/copia</b> la cartella degli esercizi sul tuo PC (da registro elettronico, chiavetta o link del docente).</div></div>
+      <div class="passo"><div class="num">2</div><div>Apri <b>Flowgorithm</b> → menu <b>File</b> → <b>Apri…</b></div></div>
+      <div class="passo"><div class="num">3</div><div>Seleziona il file <b>.fprg</b> desiderato e conferma.</div></div>
+      <div class="passo"><div class="num">4</div><div>Premi <b>Esegui ▶</b> e osserva; poi apri la finestra <b>Variabili</b> per capire come cambiano i valori a ogni passo.</div></div>
+      <div class="nota"><b>📌 Nella sottocartella</b> <span class="mono">ESERCIZI_SVOLTI_TRACCE_RISOLUZIONI</span> trovi anche le <b>tracce</b> e le <b>risoluzioni</b> pagina per pagina: prima prova da solo, poi confronta!</div>
+    </div>
+    <div>
+      <h2>🗂️ Gli esercizi topici, per argomento</h2>
+      <div class="filecard"><span class="nomef">SOMMA_2_NUMERI.fprg</span> · <span class="nomef">somma_2_num_esempio.fprg</span><br>Sequenza: input → somma → output. Il punto di partenza!</div>
+      <div class="filecard"><span class="nomef">NUMERO_MAGGIORE_tra_2_numeri.fprg</span><br>Selezione: il primo SE…ALTRIMENTI.</div>
+      <div class="filecard"><span class="nomef">pari_dispari.fprg</span> · <span class="nomef">SE_RICCO_SE_POVERO.fprg</span><br>Selezione con l'operatore % e con condizioni ≥.</div>
+      <div class="filecard"><span class="nomef">tabellina7_while.fprg</span> · <span class="nomef">tabellina7_dowhile.fprg</span><br>Cicli: stesso problema con Mentre e con Fai.</div>
+      <div class="filecard"><span class="nomef">WHILE_INSERISCI_NUMERI_FINO_AL_DISPARI.fprg</span> · <span class="nomef">DO_WHILE_…fprg</span><br>Ciclo a sentinella: ripeti finché l'utente inserisce pari.</div>
+      <div class="filecard"><span class="nomef">scambio_2_variabili.fprg</span> · <span class="nomef">decremento.fprg</span><br>Assegnazione: i grandi classici da capire bene.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 33 : DOVE SCARICARE TUTTO ============ -->
+<section class="slide">
+  <span class="badge">FILE DI LAVORO</span>
+  <h1>🌐 Riepilogo download: tutto quello che ti serve</h1>
+  <div class="cols">
+    <div>
+      <div class="box" style="border-top:6px solid var(--blu2);">
+        <h2>1️⃣ Il programma Flowgorithm</h2>
+        <p>Sito ufficiale: <span class="mono">flowgorithm.org</span></p>
+        <p>Download diretto: <span class="mono">flowgorithm.org/download/index.htm</span></p>
+        <p>Gratuito, senza registrazione. Scegli <b>Windows 64-Bit</b> (Windows 10/11).</p>
+      </div>
+      <div class="box" style="border-top:6px solid var(--verde);">
+        <h2>2️⃣ Gli esercizi di classe (.fprg)</h2>
+        <p>Cartella <b>FLOWGORITHM-FILES</b> distribuita dal docente: contiene gli esempi visti a lezione, ordinati per argomento (slide precedente).</p>
+      </div>
+    </div>
+    <div>
+      <div class="box" style="border-top:6px solid var(--arancio);">
+        <h2>3️⃣ Tracce e risoluzioni</h2>
+        <p>Sottocartella <span class="mono">ESERCIZI_SVOLTI_TRACCE_RISOLUZIONI</span>: le pagine <b>traccia-pag-…</b> contengono i testi, le pagine <b>esercizi-pag-…</b> le soluzioni.</p>
+      </div>
+      <div class="box" style="border-top:6px solid var(--viola);">
+        <h2>4️⃣ Il libro digitale</h2>
+        <p>Cartella <span class="mono">LIBRO</span>: le pagine dell'Unità 11 (Flowgorithm) da cui sono tratti gli esempi di questa guida (pagg. 358–389).</p>
+      </div>
+      <div class="curiosita"><b>🔎 Metodo di studio consigliato:</b> 1) studia la slide → 2) apri il file .fprg corrispondente → 3) eseguilo passo-passo → 4) <b>modificalo</b> (cambia numeri, condizione, messaggi): si impara programmando, non solo leggendo!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 34 : MAPPA RIEPILOGO ============ -->
+<section class="slide">
+  <h1>🗺️ Mappa di riepilogo</h1>
+  <svg viewBox="0 0 820 420" width="780">
+    <rect x="310" y="10" width="200" height="60" rx="14" fill="#1e3a8a"/>
+    <text x="410" y="47" text-anchor="middle" font-size="20" fill="#fff" font-weight="bold">ALGORITMI</text>
+    <line x1="410" y1="70" x2="130" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="320" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="510" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="700" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <rect x="40" y="130" width="180" height="55" rx="12" fill="#3b82f6"/>
+    <text x="130" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">FLOWGORITHM 💻</text>
+    <rect x="240" y="130" width="160" height="55" rx="12" fill="#eab308"/>
+    <text x="320" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">VARIABILI 📦</text>
+    <rect x="430" y="130" width="160" height="55" rx="12" fill="#dc2626"/>
+    <text x="510" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">SELEZIONE 🔀</text>
+    <rect x="615" y="130" width="170" height="55" rx="12" fill="#ea580c"/>
+    <text x="700" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">CICLI 🔁</text>
+    <line x1="130" y1="185" x2="130" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="35" y="225" width="190" height="80" rx="10" fill="#dbeafe"/>
+    <text x="130" y="250" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">flowgorithm.org</text>
+    <text x="130" y="272" text-anchor="middle" font-size="13" fill="#1e3a8a">blocchi colorati</text>
+    <text x="130" y="294" text-anchor="middle" font-size="13" fill="#1e3a8a">Esegui · Variabili · Codifica</text>
+    <line x1="320" y1="185" x2="320" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="235" y="225" width="170" height="80" rx="10" fill="#fef9c3"/>
+    <text x="320" y="250" text-anchor="middle" font-size="13" fill="#854d0e" font-weight="bold">Intero · Reale · Stringa</text>
+    <text x="320" y="272" text-anchor="middle" font-size="13" fill="#854d0e">Dichiara → Leggi → Scrivi</text>
+    <text x="320" y="294" text-anchor="middle" font-size="13" fill="#854d0e">= assegna · % resto · &amp; unisce</text>
+    <line x1="510" y1="185" x2="510" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="425" y="225" width="170" height="80" rx="10" fill="#fee2e2"/>
+    <text x="510" y="250" text-anchor="middle" font-size="13" fill="#7f1d1d" font-weight="bold">SE…ALLORA…ALTRIMENTI</text>
+    <text x="510" y="272" text-anchor="middle" font-size="13" fill="#7f1d1d">== confronta · SE annidati</text>
+    <text x="510" y="294" text-anchor="middle" font-size="13" fill="#7f1d1d">E (tutte) · O (almeno una)</text>
+    <line x1="700" y1="185" x2="700" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="612" y="225" width="176" height="80" rx="10" fill="#ffedd5"/>
+    <text x="700" y="250" text-anchor="middle" font-size="13" fill="#7c2d12" font-weight="bold">PER (contatore auto)</text>
+    <text x="700" y="272" text-anchor="middle" font-size="13" fill="#7c2d12">MENTRE (controlla prima)</text>
+    <text x="700" y="294" text-anchor="middle" font-size="13" fill="#7c2d12">FAI (almeno una volta)</text>
+    <rect x="230" y="340" width="360" height="55" rx="12" fill="#16a34a"/>
+    <text x="410" y="364" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">Schema: dichiara → input → elabora → output</text>
+    <text x="410" y="384" text-anchor="middle" font-size="12" fill="#dcfce7">…e occhio al ciclo infinito! ♾️</text>
+  </svg>
+</section>
+
+<!-- ============ SLIDE 35 : FINE ============ -->
+<section class="slide">
+  <div class="center" style="padding-top:60px;">
+    <div style="font-size:5em;">🏆</div>
+    <div class="titolone" style="font-size:2.5em;">Complimenti, ora sai programmare!</div>
+    <p style="font-size:1.3em; margin-top:20px;">Hai imparato a progettare algoritmi, disegnarli con Flowgorithm<br>e usare selezione, connettivi logici e cicli.</p>
+    <div class="box" style="max-width:640px; margin:30px auto;">
+      <h2>📅 Prossimamente:</h2>
+      <p>i <b>vettori</b> (tanti valori in una sola variabile!), le <b>funzioni</b>, gli algoritmi di <b>ordinamento</b>… e il <b>gioco "indovina il numero"</b> dell'ultima lezione del libro, con random() e tentativi contati. Si diventa veri programmatori! 🎮</p>
+    </div>
+    <p style="color:var(--grigio); margin-top:20px;">Suggerimento: riapri gli esercizi .fprg e prova a modificarli — è il modo migliore per imparare.</p>
+  </div>
+</section>
+
+
+<div id="barra"></div>
+<nav id="nav">
+  <button id="btnPrev" onclick="vai(-1)">⬅ Indietro</button>
+  <span id="contatore"></span>
+  <button id="btnNext" onclick="vai(1)">Avanti ➡</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function mostra(){
+  slides.forEach((s,i)=>s.classList.toggle('active', i===cur));
+  document.getElementById('contatore').textContent = `Slide ${cur+1} / ${slides.length}`;
+  document.getElementById('btnPrev').disabled = (cur===0);
+  document.getElementById('btnNext').disabled = (cur===slides.length-1);
+  document.getElementById('barra').style.width = ((cur+1)/slides.length*100)+'%';
+  document.querySelector('.slide.active').scrollTop = 0;
+}
+function vai(d){ cur = Math.max(0, Math.min(slides.length-1, cur+d)); mostra(); }
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') vai(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') vai(-1);
+});
+function verifica(inputId, risposta, fbId){
+  const v = document.getElementById(inputId).value.trim().replace(/\s+/g,'').toLowerCase();
+  const fb = document.getElementById(fbId);
+  if(v===''){ fb.textContent='✏️ Scrivi una risposta!'; fb.className='fb'; return; }
+  if(v===risposta.toLowerCase()){ fb.textContent='✅ Corretto! Bravo!'; fb.className='fb ok'; }
+  else{ fb.textContent='❌ Riprova…'; fb.className='fb no'; }
+}
+function quizRispondi(el, giusta){
+  const blocco = el.closest('.quiz');
+  blocco.querySelectorAll('label').forEach(l=>l.classList.remove('giusta','sbagliata'));
+  el.classList.add(giusta ? 'giusta' : 'sbagliata');
+  if(!giusta){ blocco.querySelector('label[data-ok]').classList.add('giusta'); }
+}
+mostra();
+</script>
+</body>
+</html>

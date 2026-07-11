@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appendice — Esercizi guidati · Algoritmi e Flowgorithm</title>
+<style>
+  :root{
+    --blu:#1e3a8a; --blu2:#3b82f6; --cielo:#dbeafe; --arancio:#f97316;
+    --giallo:#fbbf24; --verde:#16a34a; --rosso:#dc2626; --viola:#7c3aed;
+    --grigio:#475569; --sfondo:#f1f5f9; --carta:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--sfondo); color:#1e293b; overflow:hidden;}
+  .slide{display:none; position:fixed; inset:0 0 64px 0; overflow-y:auto; padding:36px 60px 30px 60px;}
+  .slide.active{display:block; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;}}
+  .slide h1{color:var(--blu); font-size:2.1em; border-bottom:4px solid var(--arancio); padding-bottom:8px; margin-bottom:22px;}
+  .slide h2{color:var(--blu2); font-size:1.3em; margin:18px 0 8px;}
+  .slide p, .slide li{font-size:1.12em; line-height:1.55;}
+  .slide ul, .slide ol{margin:10px 0 10px 28px;}
+  .slide li{margin-bottom:6px;}
+  .center{text-align:center;}
+  .cols{display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;}
+  .cols > div{flex:1; min-width:280px;}
+  .box{background:var(--carta); border-radius:14px; padding:18px 22px; box-shadow:0 2px 10px rgba(0,0,0,.09); margin:12px 0;}
+  .nota{background:#fff7ed; border-left:6px solid var(--arancio); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .curiosita{background:#f0fdf4; border-left:6px solid var(--verde); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .esempio{background:#eef2ff; border-left:6px solid var(--viola); border-radius:8px; padding:12px 16px; margin:14px 0;}
+  .badge{display:inline-block; background:var(--arancio); color:#fff; border-radius:20px; padding:3px 14px; font-size:.8em; font-weight:bold; letter-spacing:1px; margin-bottom:10px;}
+  table{border-collapse:collapse; margin:14px auto; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  th{background:var(--blu); color:#fff; padding:9px 16px; font-size:1em;}
+  td{border:1px solid #cbd5e1; padding:8px 16px; text-align:center; font-size:1.05em;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .mono{font-family:'Consolas','Courier New',monospace; font-weight:bold;}
+  svg{max-width:100%; height:auto; display:block; margin:10px auto;}
+  .pseudo{background:#fffbeb; border:2px solid #fcd34d; border-radius:10px; padding:14px 20px; font-family:Consolas,monospace; font-size:1.1em; line-height:1.7; margin:12px 0; white-space:pre;}
+  .pseudo b{color:#b45309;}
+  #nav{position:fixed; bottom:0; left:0; right:0; height:64px; background:var(--blu); display:flex; align-items:center; justify-content:space-between; padding:0 26px; z-index:10;}
+  #nav button{background:var(--arancio); color:#fff; border:none; border-radius:10px; padding:10px 26px; font-size:1.05em; font-weight:bold; cursor:pointer;}
+  #nav button:hover{background:#ea580c;}
+  #nav button:disabled{background:#64748b; cursor:default;}
+  #contatore{color:#fff; font-size:1.1em; font-weight:bold;}
+  #barra{position:fixed; bottom:64px; left:0; height:5px; background:var(--arancio); z-index:11; transition:width .3s;}
+  .titolone{font-size:3em; color:var(--blu); margin:30px 0 10px;}
+  .sottotitolo{font-size:1.5em; color:var(--grigio);}
+  .passo{display:flex; gap:14px; align-items:flex-start; background:#fff; border-radius:12px; padding:12px 16px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .passo .num{background:var(--arancio); color:#fff; min-width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2em; font-weight:bold;}
+  .traccia{background:#fff; border:3px solid var(--blu2); border-radius:12px; padding:14px 20px; margin:12px 0; font-size:1.12em;}
+  .traccia .tnum{display:inline-block; background:var(--blu2); color:#fff; border-radius:8px; padding:2px 12px; font-weight:bold; margin-right:8px;}
+  details{background:#fff; border:2px dashed #94a3b8; border-radius:10px; padding:10px 16px; margin:8px 0;}
+  details summary{cursor:pointer; font-weight:bold; color:var(--blu); font-size:1.05em;}
+  details summary:hover{color:var(--arancio);}
+  details[open]{border-color:var(--verde); border-style:solid; background:#f0fdf4;}
+  details .aiuto{margin-top:10px; font-size:1.05em; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 : COPERTINA ============ -->
+<section class="slide active">
+  <div class="center" style="padding-top:40px;">
+    <svg viewBox="0 0 560 210" width="460">
+      <rect x="30" y="30" width="150" height="150" rx="16" fill="#fde68a" stroke="#d97706" stroke-width="4"/>
+      <text x="105" y="95" text-anchor="middle" font-size="42">🟡</text>
+      <text x="105" y="150" text-anchor="middle" font-size="18" fill="#78350f" font-weight="bold">SEQUENZA</text>
+      <rect x="205" y="30" width="150" height="150" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="4"/>
+      <text x="280" y="95" text-anchor="middle" font-size="42">🔴</text>
+      <text x="280" y="150" text-anchor="middle" font-size="18" fill="#7f1d1d" font-weight="bold">SELEZIONE</text>
+      <rect x="380" y="30" width="150" height="150" rx="16" fill="#ffedd5" stroke="#ea580c" stroke-width="4"/>
+      <text x="455" y="95" text-anchor="middle" font-size="42">🟠</text>
+      <text x="455" y="150" text-anchor="middle" font-size="18" fill="#7c2d12" font-weight="bold">CICLI</text>
+    </svg>
+    <div class="titolone" style="font-size:2.6em;">APPENDICE — ESERCIZI</div>
+    <div class="sottotitolo">Guida di studio — Secondo anno · Algoritmi e Flowgorithm</div>
+    <p style="margin-top:24px; font-size:1.2em;">Per ogni argomento: <b>1 esercizio guida svolto</b> passo per passo<br>+ gli <b>esercizi proposti</b> con suggerimenti a scomparsa 🔍</p>
+    <p style="margin-top:26px; color:var(--grigio);">Usa le frecce ⬅ ➡ della tastiera o i pulsanti in basso per navigare</p>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 : METODO ============ -->
+<section class="slide">
+  <h1>🛠️ Prima di iniziare: il metodo delle 4 fasi</h1>
+  <p>Ogni esercizio guida di questa appendice è svolto <b>sempre nello stesso modo</b>. Usa questo schema anche tu, per ogni esercizio proposto:</p>
+  <div class="passo"><div class="num">1</div><div><b>DICHIARAZIONE — Quali variabili mi servono e di che tipo?</b><br>Rileggi la traccia e sottolinea i dati: ogni dato è una variabile. Intero o Reale? Nel dubbio (divisioni, radici, medie) scegli Reale.</div></div>
+  <div class="passo"><div class="num">2</div><div><b>ACQUISIZIONE — Quali dati chiedo all'utente?</b><br>Per ogni input: uno <span class="mono">Scrivi</span> che spiega cosa inserire + un <span class="mono">Leggi</span> che lo memorizza.</div></div>
+  <div class="passo"><div class="num">3</div><div><b>ELABORAZIONE — Quale calcolo o costrutto risolve il problema?</b><br>Assegnazione? Un SE? Un ciclo? Scrivi la formula sul quaderno prima di disegnare.</div></div>
+  <div class="passo"><div class="num">4</div><div><b>RESTITUZIONE — Cosa comunico all'utente?</b><br>Uno <span class="mono">Scrivi</span> finale con un messaggio chiaro: <span class="mono">"La media è " &amp; media</span>, non solo il numero nudo.</div></div>
+  <div class="nota"><b>📌 E alla fine, sempre la PROVA:</b> esegui l'algoritmo con numeri facili di cui conosci già il risultato (es. media di 4 e 6 → deve uscire 5). Se torna, hai finito; se non torna, apri la finestra <b>Variabili</b> e segui i valori passo per passo.</div>
+</section>
+
+<!-- ============ SLIDE 3 : SEQUENZA GUIDA ANALISI ============ -->
+<section class="slide">
+  <span class="badge">🟡 SEQUENZA — ESERCIZIO GUIDA</span>
+  <h1>Esercizio guida: la media di due numeri</h1>
+  <div class="traccia"><span class="tnum">TRACCIA</span> Scrivi un algoritmo che, dati in ingresso due valori interi, ne restituisca la <b>media</b>.</div>
+  <h2>Applichiamo il metodo delle 4 fasi</h2>
+  <div class="cols">
+    <div>
+      <div class="box" style="border-top:6px solid #eab308;">
+        <p><b>1️⃣ Dichiarazione</b> — mi servono i due numeri e la media:<br>
+        <span class="mono">num1, num2, media</span> → tipo <b>Reale</b></p>
+        <p style="margin-top:8px;"><b>⚠️ Perché Reale e non Intero?</b> Il libro ci avverte: la media di 5 e 6 è 5.5 — un numero con la virgola non entra in una variabile Intero!</p>
+      </div>
+      <div class="box" style="border-top:6px solid #0891b2;">
+        <p><b>2️⃣ Acquisizione</b> — due input, ognuno con il suo avviso:</p>
+        <p class="mono" style="margin-top:6px;">Scrivi "Inserisci il primo numero: "<br>Leggi num1<br>Scrivi "Inserisci il secondo numero: "<br>Leggi num2</p>
+      </div>
+    </div>
+    <div>
+      <div class="box" style="border-top:6px solid #7c3aed;">
+        <p><b>3️⃣ Elaborazione</b> — la formula della media:</p>
+        <p class="mono" style="margin-top:6px; font-size:1.2em;">media = (num1 + num2) / 2</p>
+        <p style="margin-top:8px;"><b>⚠️ Le parentesi sono obbligatorie!</b> Senza parentesi, <span class="mono">num1 + num2/2</span> divide solo num2 (prima la divisione, poi la somma): risultato sbagliato!</p>
+      </div>
+      <div class="box" style="border-top:6px solid #16a34a;">
+        <p><b>4️⃣ Restituzione</b> — messaggio chiaro con la &amp;:</p>
+        <p class="mono" style="margin-top:6px;">Scrivi "La media è " &amp; media</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 4 : SEQUENZA GUIDA DIAGRAMMA ============ -->
+<section class="slide">
+  <span class="badge">🟡 SEQUENZA — ESERCIZIO GUIDA</span>
+  <h1>Media di due numeri: diagramma e prova</h1>
+  <div class="cols">
+    <div class="center">
+      <svg viewBox="0 0 300 420" width="250">
+        <rect x="90" y="5" width="120" height="30" rx="15" fill="#c084fc"/><text x="150" y="25" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="150" y1="35" x2="150" y2="48" stroke="#475569" stroke-width="3"/>
+        <rect x="40" y="48" width="220" height="32" fill="#fde68a" stroke="#d97706" stroke-width="2"/><text x="150" y="69" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">Dichiara num1, num2, media: Reale</text>
+        <line x1="150" y1="80" x2="150" y2="93" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,93 265,93 245,125 35,125" fill="#86efac"/><text x="150" y="113" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "Inserisci il primo numero: "</text>
+        <line x1="150" y1="125" x2="150" y2="138" stroke="#475569" stroke-width="3"/>
+        <polygon points="70,138 250,138 232,168 52,168" fill="#93c5fd"/><text x="150" y="157" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi num1</text>
+        <line x1="150" y1="168" x2="150" y2="181" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,181 265,181 245,213 35,213" fill="#86efac"/><text x="150" y="201" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "Inserisci il secondo numero: "</text>
+        <line x1="150" y1="213" x2="150" y2="226" stroke="#475569" stroke-width="3"/>
+        <polygon points="70,226 250,226 232,256 52,256" fill="#93c5fd"/><text x="150" y="245" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi num2</text>
+        <line x1="150" y1="256" x2="150" y2="269" stroke="#475569" stroke-width="3"/>
+        <rect x="55" y="269" width="190" height="30" fill="#fde68a"/><text x="150" y="289" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">media = (num1+num2)/2</text>
+        <line x1="150" y1="299" x2="150" y2="312" stroke="#475569" stroke-width="3"/>
+        <polygon points="55,312 265,312 245,344 35,344" fill="#86efac"/><text x="150" y="332" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "La media è " &amp; media</text>
+        <line x1="150" y1="344" x2="150" y2="357" stroke="#475569" stroke-width="3"/>
+        <rect x="90" y="357" width="120" height="30" rx="15" fill="#c084fc"/><text x="150" y="377" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+    </div>
+    <div>
+      <h2>In pseudocodice</h2>
+      <div class="pseudo"><b>INIZIO</b>
+  <b>DICHIARA</b> num1, num2, media: Reale
+  <b>SCRIVI</b> "Inserisci il primo numero: "
+  <b>LEGGI</b> num1
+  <b>SCRIVI</b> "Inserisci il secondo numero: "
+  <b>LEGGI</b> num2
+  media = (num1 + num2) / 2
+  <b>SCRIVI</b> "La media è " &amp; media
+<b>FINE</b></div>
+      <h2>La prova 🧪</h2>
+      <table>
+        <tr><th>num1</th><th>num2</th><th>media attesa</th><th>OK?</th></tr>
+        <tr><td>4</td><td>6</td><td>5</td><td>✅</td></tr>
+        <tr><td>5</td><td>6</td><td>5.5</td><td>✅ (grazie al tipo Reale!)</td></tr>
+      </table>
+      <div class="curiosita"><b>🔎 Confronta con la cartella di classe:</b> il file <span class="mono">SOMMA_2_NUMERI.fprg</span> è quasi identico — cambia solo l'elaborazione. È così che nascono le famiglie di esercizi!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 5 : SEQUENZA PROPOSTE ============ -->
+<section class="slide">
+  <span class="badge">🟡 SEQUENZA — ESERCIZI PROPOSTI</span>
+  <h1>Ora tocca a te: esercizi sulla sequenza</h1>
+  <p>Risolvili con il metodo delle 4 fasi. Prova da solo, poi apri il suggerimento solo se sei bloccato!</p>
+  <div class="traccia"><span class="tnum">1</span> Dati in ingresso <b>tre valori interi</b>, restituisci la loro <b>somma</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Variabili: <span class="mono">num1, num2, num3, somma: Intero</span> (niente virgole qui: la somma di interi è intera). Elaborazione: <span class="mono">somma = num1+num2+num3</span>. Confronta con <span class="mono">SOMMA_2_NUMERI.fprg</span> e aggiungi il terzo numero.</div></details>
+  <div class="traccia"><span class="tnum">2</span> Data la misura del <b>lato di un quadrato</b>, restituisci la misura della <b>diagonale</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">La diagonale è <span class="mono">lato × √2</span>, cioè: <span class="mono">diagonale = lato * sqrt(2)</span>. Tipo <b>Reale</b> obbligatorio (√2 = 1.414…). Prova: lato 1 → diagonale ≈ 1.41. Nel libro trovi l'esempio gemello con l'ipotenusa: <span class="mono">ipotenusa = sqrt(cateto1^2 + cateto2^2)</span>.</div></details>
+  <div class="traccia"><span class="tnum">3</span> Dato il <b>prezzo</b> di un prodotto, calcola il prezzo finale con <b>IVA al 22%</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Elaborazione: <span class="mono">finale = prezzo * 1.22</span> (oppure <span class="mono">prezzo + prezzo*22/100</span>). Prova: 100 € → 122 €. Nella cartella di classe c'è il file <span class="mono">spesaIVA.fprg</span> per confrontare!</div></details>
+  <div class="traccia"><span class="tnum">4</span> Chiedi <b>nome</b> ed <b>età</b> e stampa: "Ciao <i>nome</i>, hai <i>età</i> anni!"</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Due tipi diversi: <span class="mono">nome: Stringa</span>, <span class="mono">eta: Intero</span> (senza accento nel nome della variabile!). Output con doppia concatenazione: <span class="mono">"Ciao " &amp; nome &amp; ", hai " &amp; eta &amp; " anni!"</span></div></details>
+</section>
+<!-- ============ SLIDE 6 : SELEZIONE GUIDA ANALISI ============ -->
+<section class="slide">
+  <span class="badge">🔴 SELEZIONE — ESERCIZIO GUIDA</span>
+  <h1>Esercizio guida: il maggiore di due numeri</h1>
+  <div class="traccia"><span class="tnum">TRACCIA</span> Scrivi un algoritmo che, dati in ingresso due numeri interi distinti, restituisca il <b>maggiore</b>.</div>
+  <h2>Applichiamo il metodo delle 4 fasi</h2>
+  <div class="cols">
+    <div>
+      <div class="box" style="border-top:6px solid #eab308;">
+        <p><b>1️⃣ Dichiarazione</b> — solo i due numeri:<br><span class="mono">num1, num2</span> → tipo <b>Intero</b></p>
+        <p style="margin-top:8px;">Non serve una variabile "maggiore": possiamo stampare direttamente num1 o num2. (Ma se vuoi crearla, va benissimo!)</p>
+      </div>
+      <div class="box" style="border-top:6px solid #0891b2;">
+        <p><b>2️⃣ Acquisizione</b> — come sempre, Scrivi + Leggi per ciascun numero.</p>
+      </div>
+    </div>
+    <div>
+      <div class="box" style="border-top:6px solid #7c3aed;">
+        <p><b>3️⃣ Elaborazione</b> — qui serve una <b>decisione</b>: il rombo!</p>
+        <p class="mono" style="margin-top:6px; font-size:1.15em;">SE (num1 &gt; num2) ALLORA<br>&nbsp;&nbsp;&nbsp;il maggiore è num1<br>ALTRIMENTI<br>&nbsp;&nbsp;&nbsp;il maggiore è num2</p>
+        <p style="margin-top:8px;"><b>⚠️ Ricorda:</b> nel confronto si usa <span class="mono">&gt;</span>, non serve <span class="mono">==</span> perché la traccia dice numeri <b>distinti</b>.</p>
+      </div>
+      <div class="box" style="border-top:6px solid #16a34a;">
+        <p><b>4️⃣ Restituzione</b> — uno Scrivi in ciascun ramo del SE.</p>
+      </div>
+    </div>
+  </div>
+  <div class="curiosita"><b>🔎 Questo esercizio è il file</b> <span class="mono">NUMERO_MAGGIORE_tra_2_numeri.fprg</span> della cartella di classe: aprilo e confronta la tua soluzione!</div>
+</section>
+
+<!-- ============ SLIDE 7 : SELEZIONE GUIDA DIAGRAMMA ============ -->
+<section class="slide">
+  <span class="badge">🔴 SELEZIONE — ESERCIZIO GUIDA</span>
+  <h1>Maggiore di due numeri: diagramma e prova</h1>
+  <div class="cols">
+    <div class="center">
+      <svg viewBox="0 0 400 400" width="330">
+        <rect x="140" y="5" width="120" height="28" rx="14" fill="#c084fc"/><text x="200" y="24" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="200" y1="33" x2="200" y2="46" stroke="#475569" stroke-width="3"/>
+        <rect x="110" y="46" width="180" height="28" fill="#fde68a" stroke="#d97706"/><text x="200" y="65" text-anchor="middle" font-size="11" fill="#78350f" font-weight="bold">Dichiara num1, num2: Intero</text>
+        <line x1="200" y1="74" x2="200" y2="87" stroke="#475569" stroke-width="3"/>
+        <polygon points="115,87 285,87 268,117 98,117" fill="#86efac"/><text x="200" y="106" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi "Inserisci due numeri: "</text>
+        <line x1="200" y1="117" x2="200" y2="130" stroke="#475569" stroke-width="3"/>
+        <polygon points="130,130 270,130 255,158 115,158" fill="#93c5fd"/><text x="200" y="149" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi num1</text>
+        <line x1="200" y1="158" x2="200" y2="171" stroke="#475569" stroke-width="3"/>
+        <polygon points="130,171 270,171 255,199 115,199" fill="#93c5fd"/><text x="200" y="190" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">Leggi num2</text>
+        <line x1="200" y1="199" x2="200" y2="216" stroke="#475569" stroke-width="3"/>
+        <polygon points="200,216 280,258 200,300 120,258" fill="#fda4af" stroke="#dc2626" stroke-width="2"/>
+        <text x="200" y="264" text-anchor="middle" font-size="13" fill="#7f1d1d" font-weight="bold">num1 &gt; num2</text>
+        <line x1="120" y1="258" x2="55" y2="258" stroke="#475569" stroke-width="3"/><text x="88" y="247" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="bold">Falso</text>
+        <line x1="55" y1="258" x2="55" y2="310" stroke="#475569" stroke-width="3"/>
+        <polygon points="12,310 110,310 98,342 0,342" fill="#86efac"/><text x="55" y="331" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi num2</text>
+        <line x1="280" y1="258" x2="345" y2="258" stroke="#475569" stroke-width="3"/><text x="315" y="247" text-anchor="middle" font-size="11" fill="#16a34a" font-weight="bold">Vero</text>
+        <line x1="345" y1="258" x2="345" y2="310" stroke="#475569" stroke-width="3"/>
+        <polygon points="302,310 400,310 388,342 290,342" fill="#86efac"/><text x="345" y="331" text-anchor="middle" font-size="10" fill="#14532d" font-weight="bold">Scrivi num1</text>
+        <line x1="55" y1="342" x2="55" y2="362" stroke="#475569" stroke-width="3"/><line x1="345" y1="342" x2="345" y2="362" stroke="#475569" stroke-width="3"/>
+        <line x1="55" y1="362" x2="345" y2="362" stroke="#475569" stroke-width="3"/>
+        <circle cx="200" cy="362" r="6" fill="#f97316"/>
+        <line x1="200" y1="368" x2="200" y2="376" stroke="#475569" stroke-width="3"/>
+        <rect x="140" y="376" width="120" height="22" rx="11" fill="#c084fc"/><text x="200" y="392" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+    </div>
+    <div>
+      <h2>In pseudocodice</h2>
+      <div class="pseudo"><b>INIZIO</b>
+  <b>DICHIARA</b> num1, num2: Intero
+  <b>SCRIVI</b> "Inserisci due numeri: "
+  <b>LEGGI</b> num1
+  <b>LEGGI</b> num2
+  <b>SE</b> (num1 &gt; num2) <b>ALLORA</b>
+    <b>SCRIVI</b> "Il maggiore è " &amp; num1
+  <b>ALTRIMENTI</b>
+    <b>SCRIVI</b> "Il maggiore è " &amp; num2
+  <b>FINE SE</b>
+<b>FINE</b></div>
+      <h2>La prova 🧪</h2>
+      <table>
+        <tr><th>num1</th><th>num2</th><th>condizione</th><th>output</th></tr>
+        <tr><td>9</td><td>4</td><td>9&gt;4 → vero</td><td>9 ✅</td></tr>
+        <tr><td>3</td><td>7</td><td>3&gt;7 → falso</td><td>7 ✅</td></tr>
+      </table>
+      <div class="nota"><b>📌 Prova sempre ENTRAMBI i rami:</b> un test con Vero e uno con Falso. Un SE testato a metà è un SE non testato!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 8 : SELEZIONE PROPOSTE ============ -->
+<section class="slide">
+  <span class="badge">🔴 SELEZIONE — ESERCIZI PROPOSTI</span>
+  <h1>Ora tocca a te: esercizi sulla selezione</h1>
+  <div class="traccia"><span class="tnum">1</span> Dati due numeri interi distinti, restituisci il maggiore <b>se il primo è pari</b>, altrimenti il <b>minore</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Due SE in fila: il primo controlla <span class="mono">num1%2==0</span> (num1 è pari?). Nel ramo Vero metti il confronto per il maggiore, nel ramo Falso quello per il minore. È un esercizio di <b>SE annidati</b> travestito!</div></details>
+  <div class="traccia"><span class="tnum">2</span> Dati <b>tre numeri</b> interi distinti, restituisci il <b>maggiore</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Strada 1 (SE annidati): <span class="mono">SE num1&gt;num2</span>: il candidato è num1, confrontalo con num3; altrimenti il candidato è num2, confrontalo con num3.<br>Strada 2 (connettivo E): <span class="mono">SE (num1&gt;num2) E (num1&gt;num3)</span> → è num1… — come nell'esercizio svolto 4 del libro. Prova entrambe!</div></details>
+  <div class="traccia"><span class="tnum">3</span> Dato un <b>voto</b> da 1 a 10, stampa "promosso" se ≥ 6, altrimenti "bocciato".</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Un solo SE con <span class="mono">voto&gt;=6</span>. Versione avanzata a tre uscite (come <span class="mono">promosso_bocciato_rimandar.fprg</span>): aggiungi il caso "rimandato" per i voti tra 5 e 6 con un SE annidato.</div></details>
+  <div class="traccia"><span class="tnum">4</span> Dato lo <b>stipendio mensile</b>, stampa "ricco" se ≥ 1500 €, altrimenti "povero".</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">È il file di classe <span class="mono">SE_RICCO_SE_POVERO.fprg</span>! Condizione: <span class="mono">pagaMensile&gt;=1500</span>. Attenzione al ≥: con 1500 esatti deve dire "ricco".</div></details>
+  <div class="traccia"><span class="tnum">5</span> Dati due voti, stampa <b>"Eccellente!"</b> se <b>almeno uno</b> è ≥ 9.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Serve il connettivo <b>O</b>: <span class="mono">SE ((voto1&gt;=9) O (voto2&gt;=9)) ALLORA…</span> È l'esercizio svolto 5 del libro. Domanda extra: e se li volessi <b>entrambi</b> ≥ 9? (Risposta: basta cambiare O con E!)</div></details>
+</section>
+
+<!-- ============ SLIDE 9 : CICLI GUIDA ANALISI ============ -->
+<section class="slide">
+  <span class="badge">🟠 CICLI — ESERCIZIO GUIDA</span>
+  <h1>Esercizio guida: i primi 10 numeri dispari</h1>
+  <div class="traccia"><span class="tnum">TRACCIA</span> Scrivi un algoritmo che stampi i <b>primi 10 numeri dispari</b> (1, 3, 5, … 19).</div>
+  <h2>Applichiamo il metodo delle 4 fasi</h2>
+  <div class="cols">
+    <div>
+      <div class="box" style="border-top:6px solid #eab308;">
+        <p><b>1️⃣ Dichiarazione</b> — solo il contatore del ciclo:<br><span class="mono">i</span> → tipo <b>Intero</b></p>
+      </div>
+      <div class="box" style="border-top:6px solid #0891b2;">
+        <p><b>2️⃣ Acquisizione</b> — <b>nessun input!</b> Come dice il libro per i primi 10 pari: il software deve soltanto restituirci i numeri. Questa fase può anche essere vuota.</p>
+      </div>
+      <div class="box" style="border-top:6px solid #7c3aed;">
+        <p><b>3️⃣ Elaborazione</b> — 10 ripetizioni note in anticipo → <b>ciclo FOR</b>. L'idea furba del libro (2*i = pari) si adatta: se i va da 0 a 9, allora <span class="mono">2*i+1</span> vale 1, 3, 5, … 19: i dispari!</p>
+      </div>
+      <div class="box" style="border-top:6px solid #16a34a;">
+        <p><b>4️⃣ Restituzione</b> — lo Scrivi sta <b>dentro</b> il ciclo: <span class="mono">Scrivi 2*i+1</span>.</p>
+      </div>
+    </div>
+    <div>
+      <h2>Costruiamo la tabellina di verifica</h2>
+      <table>
+        <tr><th>giro</th><th class="mono">i</th><th class="mono">2*i+1</th></tr>
+        <tr><td>1°</td><td>0</td><td><b>1</b></td></tr>
+        <tr><td>2°</td><td>1</td><td><b>3</b></td></tr>
+        <tr><td>3°</td><td>2</td><td><b>5</b></td></tr>
+        <tr><td>…</td><td>…</td><td>…</td></tr>
+        <tr><td>10°</td><td>9</td><td><b>19</b></td></tr>
+      </table>
+      <div class="nota"><b>📌 La tabella di traccia</b> (giro per giro) è l'arma segreta per capire i cicli: falla sul quaderno PRIMA di eseguire, poi confronta con la finestra <b>Variabili</b> di Flowgorithm.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 10 : CICLI GUIDA DIAGRAMMA ============ -->
+<section class="slide">
+  <span class="badge">🟠 CICLI — ESERCIZIO GUIDA</span>
+  <h1>Primi 10 dispari: diagramma e varianti</h1>
+  <div class="cols">
+    <div class="center">
+      <svg viewBox="0 0 340 330" width="290">
+        <rect x="110" y="5" width="120" height="30" rx="15" fill="#c084fc"/><text x="170" y="25" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Inizio</text>
+        <line x1="170" y1="35" x2="170" y2="50" stroke="#475569" stroke-width="3"/>
+        <rect x="85" y="50" width="170" height="30" fill="#fde68a" stroke="#d97706"/><text x="170" y="70" text-anchor="middle" font-size="12" fill="#78350f" font-weight="bold">Dichiara i: Intero</text>
+        <line x1="170" y1="80" x2="170" y2="97" stroke="#475569" stroke-width="3"/>
+        <polygon points="110,97 230,97 250,124 230,151 110,151 90,124" fill="#fdba74" stroke="#ea580c" stroke-width="3"/>
+        <text x="170" y="130" text-anchor="middle" font-size="14" fill="#7c2d12" font-weight="bold">i = 0 a 9</text>
+        <line x1="170" y1="151" x2="170" y2="175" stroke="#475569" stroke-width="3"/>
+        <polygon points="105,175 235,175 220,210 90,210" fill="#86efac" stroke="#16a34a" stroke-width="2"/>
+        <text x="163" y="197" text-anchor="middle" font-size="13" fill="#14532d" font-weight="bold">Scrivi 2*i+1</text>
+        <path d="M163 210 v25 h147 v-111 h-58" stroke="#ea580c" stroke-width="3" fill="none"/>
+        <text x="290" y="170" text-anchor="middle" font-size="11" fill="#ea580c" font-weight="bold">Ripeti</text>
+        <line x1="90" y1="124" x2="45" y2="124" stroke="#475569" stroke-width="3"/>
+        <text x="66" y="112" text-anchor="middle" font-size="11" fill="#475569" font-weight="bold">Termina</text>
+        <line x1="45" y1="124" x2="45" y2="265" stroke="#475569" stroke-width="3"/><line x1="45" y1="265" x2="170" y2="265" stroke="#475569" stroke-width="3"/>
+        <line x1="170" y1="265" x2="170" y2="285" stroke="#475569" stroke-width="3"/>
+        <rect x="110" y="285" width="120" height="30" rx="15" fill="#c084fc"/><text x="170" y="305" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">Fine</text>
+      </svg>
+      <p style="color:var(--grigio); font-size:.95em;">Output: 1 3 5 7 9 11 13 15 17 19</p>
+    </div>
+    <div>
+      <h2>Tre strade, stesso risultato</h2>
+      <div class="pseudo"><b>PER</b> i <b>DA</b> 0 <b>A</b> 9
+   <b>SCRIVI</b> 2*i+1
+<b>FINE PER</b></div>
+      <div class="pseudo"><b>PER</b> i <b>DA</b> 1 <b>A</b> 19 <b>PASSO</b> 2
+   <b>SCRIVI</b> i
+<b>FINE PER</b></div>
+      <div class="pseudo">i = 1
+<b>MENTRE</b> i &lt;= 19
+   <b>SCRIVI</b> i
+   i = i + 2
+<b>FINE MENTRE</b></div>
+      <div class="curiosita"><b>🔎 Dal libro:</b> FOR e WHILE sono equivalenti! Nella cartella di classe, <span class="mono">numeri dispari da1 a 19.fprg</span> risolve proprio questo problema: confrontalo con le tue versioni.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 11 : CICLI PROPOSTE ============ -->
+<section class="slide">
+  <span class="badge">🟠 CICLI — ESERCIZI PROPOSTI</span>
+  <h1>Ora tocca a te: esercizi sui cicli</h1>
+  <div class="traccia"><span class="tnum">1</span> Stampa tutti i numeri interi <b>compresi tra 10 e 20</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto"><span class="mono">PER i DA 10 A 20 → SCRIVI i</span>. Il contatore non deve partire per forza da 0 o da 1! (Esercizio Check del libro, pag. 379.)</div></details>
+  <div class="traccia"><span class="tnum">2</span> Stampa tutti i numeri <b>pari compresi tra 1 e 50</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Strada 1: <span class="mono">PER i DA 2 A 50 PASSO 2</span>. Strada 2: ciclo da 1 a 50 con dentro <span class="mono">SE i%2==0 ALLORA SCRIVI i</span> — un ciclo con una selezione dentro: costrutti combinati!</div></details>
+  <div class="traccia"><span class="tnum">3</span> Dato un numero <b>num</b> inserito dall'utente, stampa i <b>primi num numeri pari</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Qui il numero di giri lo decide l'utente: <span class="mono">PER i DA 0 A num-1 → SCRIVI 2*i</span>. Attenzione al <b>num-1</b>: da 0 a num-1 ci sono esattamente num giri. Prova con num=3 → 0 2 4.</div></details>
+  <div class="traccia"><span class="tnum">4</span> Dato in ingresso <b>num</b>, stampa in ordine <b>decrescente</b> i valori da num a 0.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">È l'esercizio svolto 7 del libro! Con il WHILE: <span class="mono">MENTRE num&gt;=0 → SCRIVI num → num=num-1</span>. Il contatore… scende! Domanda: cosa succede con un numero negativo in ingresso? (Il ciclo non parte mai: condizione subito falsa.)</div></details>
+  <div class="traccia"><span class="tnum">5</span> Stampa la <b>tabellina</b> di un numero inserito dall'utente.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Generalizza <span class="mono">tabellina7_while.fprg</span>: leggi <span class="mono">num</span>, poi <span class="mono">PER i DA 1 A 10 → SCRIVI num*i</span>. Versione elegante: <span class="mono">SCRIVI num &amp; " x " &amp; i &amp; " = " &amp; num*i</span>.</div></details>
+  <div class="traccia"><span class="tnum">6</span> ⭐ Sfida: continua a chiedere numeri <b>finché</b> l'utente non inserisce un <b>dispari</b>.</div>
+  <details><summary>🔍 Suggerimento</summary><div class="aiuto">Ciclo a sentinella: <span class="mono">MENTRE num%2==0 → chiedi num</span> (inizializza num=0 per entrare nel ciclo). Confronta le due soluzioni di classe: <span class="mono">WHILE_INSERISCI_NUMERI_FINO_AL_DISPARI.fprg</span> e la versione DO_WHILE: quale ti sembra più naturale?</div></details>
+</section>
+
+<!-- ============ SLIDE 12 : CHECKLIST ============ -->
+<section class="slide">
+  <h1>✅ Prima di consegnare: la checklist</h1>
+  <div class="cols">
+    <div>
+      <div class="box"><h2>📋 Controlli sull'algoritmo</h2>
+      <ul>
+        <li>Ho dichiarato <b>tutte</b> le variabili, con il <b>tipo giusto</b>? (medie e radici → Reale!)</li>
+        <li>Ogni <span class="mono">Leggi</span> ha il suo <span class="mono">Scrivi</span> di avviso prima?</li>
+        <li>Ho usato <span class="mono">==</span> nei confronti e <span class="mono">=</span> nelle assegnazioni?</li>
+        <li>Nei WHILE: la variabile della condizione <b>cambia</b> dentro il ciclo?</li>
+        <li>L'output finale ha un <b>messaggio chiaro</b>, non un numero nudo?</li>
+      </ul></div>
+    </div>
+    <div>
+      <div class="box"><h2>🧪 Controlli con la prova</h2>
+      <ul>
+        <li>Ho eseguito con <b>numeri facili</b> di cui conosco il risultato?</li>
+        <li>Per i SE: ho provato <b>sia il ramo Vero che il Falso</b>?</li>
+        <li>Per i cicli: ho controllato il <b>primo</b> e l'<b>ultimo</b> valore stampato?</li>
+        <li>Ho provato un caso "strano"? (zero, numero negativo, numeri uguali…)</li>
+        <li>Ho guardato la finestra <b>Variabili</b> almeno una volta, passo per passo?</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="nota"><b>📌 Consiglio da programmatore:</b> se la prova fallisce, non cancellare tutto! Esegui passo-passo (pulsante <b>▶| Passo</b> nella finestra Esecuzione) e trova il <b>primo</b> punto in cui i valori non sono quelli che ti aspettavi: lì abita il bug. 🐛</div>
+</section>
+
+<!-- ============ SLIDE 13 : FINE ============ -->
+<section class="slide">
+  <div class="center" style="padding-top:60px;">
+    <div style="font-size:5em;">💪</div>
+    <div class="titolone" style="font-size:2.5em;">Buon lavoro!</div>
+    <p style="font-size:1.3em; margin-top:20px;">Hai un esercizio guida per ogni argomento e 15 esercizi da svolgere.<br>Ricorda il percorso: <b>4 fasi sul quaderno → diagramma in Flowgorithm → prova → checklist</b>.</p>
+    <div class="box" style="max-width:640px; margin:30px auto;">
+      <h2>📂 I tuoi alleati</h2>
+      <p>La <b>guida di studio anno 2</b> per ripassare la teoria · i file <b>.fprg</b> della cartella di classe per confrontare le soluzioni · la sottocartella <span class="mono">ESERCIZI_SVOLTI_TRACCE_RISOLUZIONI</span> per tracce e risoluzioni extra.</p>
+    </div>
+    <p style="color:var(--grigio); margin-top:20px;">Apri i suggerimenti 🔍 solo dopo aver provato da solo: è lì che si impara davvero.</p>
+  </div>
+</section>
+
+
+<div id="barra"></div>
+<nav id="nav">
+  <button id="btnPrev" onclick="vai(-1)">⬅ Indietro</button>
+  <span id="contatore"></span>
+  <button id="btnNext" onclick="vai(1)">Avanti ➡</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function mostra(){
+  slides.forEach((s,i)=>s.classList.toggle('active', i===cur));
+  document.getElementById('contatore').textContent = `Slide ${cur+1} / ${slides.length}`;
+  document.getElementById('btnPrev').disabled = (cur===0);
+  document.getElementById('btnNext').disabled = (cur===slides.length-1);
+  document.getElementById('barra').style.width = ((cur+1)/slides.length*100)+'%';
+  document.querySelector('.slide.active').scrollTop = 0;
+}
+function vai(d){ cur = Math.max(0, Math.min(slides.length-1, cur+d)); mostra(); }
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') vai(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') vai(-1);
+});
+mostra();
+</script>
+</body>
+</html>
