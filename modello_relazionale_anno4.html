@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informatica — Anno 4 · Il modello logico relazionale</title>
+<style>
+  :root{
+    --blu:#1e3a8a; --blu2:#3b82f6; --cielo:#dbeafe; --arancio:#f97316;
+    --giallo:#fbbf24; --verde:#16a34a; --rosso:#dc2626; --viola:#7c3aed;
+    --fucsia:#c026d3; --grigio:#475569; --sfondo:#f1f5f9; --carta:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--sfondo); color:#1e293b; overflow:hidden;}
+  .slide{display:none; position:fixed; inset:0 0 64px 0; overflow-y:auto; padding:36px 60px 30px 60px;}
+  .slide.active{display:block; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;}}
+  .slide h1{color:var(--blu); font-size:2.05em; border-bottom:4px solid var(--arancio); padding-bottom:8px; margin-bottom:20px;}
+  .slide h2{color:var(--blu2); font-size:1.3em; margin:16px 0 8px;}
+  .slide p, .slide li{font-size:1.1em; line-height:1.55;}
+  .slide ul, .slide ol{margin:10px 0 10px 28px;}
+  .slide li{margin-bottom:6px;}
+  .center{text-align:center;}
+  .cols{display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;}
+  .cols > div{flex:1; min-width:280px;}
+  .box{background:var(--carta); border-radius:14px; padding:16px 20px; box-shadow:0 2px 10px rgba(0,0,0,.09); margin:12px 0;}
+  .nota{background:#fff7ed; border-left:6px solid var(--arancio); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .curiosita{background:#f0fdf4; border-left:6px solid var(--verde); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .esempio{background:#eef2ff; border-left:6px solid var(--viola); border-radius:8px; padding:12px 16px; margin:14px 0;}
+  .badge{display:inline-block; background:var(--arancio); color:#fff; border-radius:20px; padding:3px 14px; font-size:.8em; font-weight:bold; letter-spacing:1px; margin-bottom:10px;}
+  table{border-collapse:collapse; margin:14px auto; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  th{background:var(--blu); color:#fff; padding:8px 14px; font-size:.98em;}
+  td{border:1px solid #cbd5e1; padding:7px 13px; text-align:center; font-size:1.02em;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .mono{font-family:'Consolas','Courier New',monospace; font-weight:bold;}
+  svg{max-width:100%; height:auto; display:block; margin:10px auto;}
+  .schema{background:#fffbeb; border:2px solid #fcd34d; border-radius:10px; padding:14px 20px; font-family:Consolas,monospace; font-size:1.06em; line-height:1.8; margin:12px 0;}
+  .schema u{text-decoration:underline; font-weight:bold;}
+  .schema .fk{color:#4338ca; font-weight:bold;}
+  .pkb{display:inline-block; background:#fee2e2; color:#b91c1c; border-radius:10px; padding:1px 8px; font-size:.75em; font-weight:bold;}
+  .fkb{display:inline-block; background:#e0e7ff; color:#4338ca; border-radius:10px; padding:1px 8px; font-size:.75em; font-weight:bold;}
+  #nav{position:fixed; bottom:0; left:0; right:0; height:64px; background:var(--blu); display:flex; align-items:center; justify-content:space-between; padding:0 26px; z-index:10;}
+  #nav button{background:var(--arancio); color:#fff; border:none; border-radius:10px; padding:10px 26px; font-size:1.05em; font-weight:bold; cursor:pointer;}
+  #nav button:hover{background:#ea580c;}
+  #nav button:disabled{background:#64748b; cursor:default;}
+  #contatore{color:#fff; font-size:1.1em; font-weight:bold;}
+  #barra{position:fixed; bottom:64px; left:0; height:5px; background:var(--arancio); z-index:11; transition:width .3s;}
+  .eser{background:#fff; border:2px solid var(--cielo); border-radius:12px; padding:14px 18px; margin:10px 0; display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .eser .dom{font-size:1.08em; font-weight:bold; min-width:300px; flex:2;}
+  .eser input{font-family:Consolas,monospace; font-size:1.1em; padding:8px 12px; border:2px solid #94a3b8; border-radius:8px; width:170px;}
+  .eser button{background:var(--blu2); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:1em; font-weight:bold; cursor:pointer;}
+  .eser button:hover{background:var(--blu);}
+  .eser .fb{font-weight:bold; font-size:1.05em; min-width:160px;}
+  .ok{color:var(--verde);} .no{color:var(--rosso);}
+  .quiz{background:#fff; border-radius:12px; padding:16px 20px; margin:12px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .quiz p{font-weight:bold; margin-bottom:8px;}
+  .quiz label{display:block; padding:7px 12px; border-radius:8px; cursor:pointer; margin:4px 0; border:2px solid transparent; font-size:1.05em;}
+  .quiz label:hover{background:var(--cielo);}
+  .quiz label.giusta{background:#dcfce7; border-color:var(--verde);}
+  .quiz label.sbagliata{background:#fee2e2; border-color:var(--rosso);}
+  .titolone{font-size:3em; color:var(--blu); margin:30px 0 10px;}
+  .sottotitolo{font-size:1.5em; color:var(--grigio);}
+  .passo{display:flex; gap:14px; align-items:flex-start; background:#fff; border-radius:12px; padding:12px 16px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .passo .num{background:var(--arancio); color:#fff; min-width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2em; font-weight:bold;}
+  .traccia{background:#fff; border:3px solid var(--blu2); border-radius:12px; padding:14px 20px; margin:12px 0; font-size:1.08em;}
+  .traccia .tnum{display:inline-block; background:var(--blu2); color:#fff; border-radius:8px; padding:2px 12px; font-weight:bold; margin-right:8px;}
+  details{background:#fff; border:2px dashed #94a3b8; border-radius:10px; padding:10px 16px; margin:8px 0;}
+  details summary{cursor:pointer; font-weight:bold; color:var(--blu); font-size:1.05em;}
+  details summary:hover{color:var(--arancio);}
+  details[open]{border-color:var(--verde); border-style:solid; background:#f0fdf4;}
+  details .aiuto{margin-top:10px; font-size:1.03em; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 : COPERTINA ============ -->
+<section class="slide active">
+  <div class="center" style="padding-top:20px;">
+    <svg viewBox="0 0 640 230" width="560">
+      <rect x="40" y="30" width="240" height="40" rx="6" fill="#1e3a8a"/>
+      <text x="160" y="56" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">STUDENTE</text>
+      <rect x="40" y="70" width="240" height="36" fill="#fff" stroke="#cbd5e1"/>
+      <text x="160" y="93" text-anchor="middle" font-size="13" fill="#1e293b"><tspan font-weight="bold" fill="#b91c1c">Matricola</tspan> · Cognome · Classe</text>
+      <rect x="40" y="106" width="240" height="30" fill="#f8fafc" stroke="#cbd5e1"/><text x="160" y="126" text-anchor="middle" font-size="12" fill="#475569">1024 · Bianchi · 4B</text>
+      <rect x="40" y="136" width="240" height="30" fill="#fff" stroke="#cbd5e1"/><text x="160" y="156" text-anchor="middle" font-size="12" fill="#475569">1025 · Verdi · 4A</text>
+      <rect x="360" y="30" width="240" height="40" rx="6" fill="#7c3aed"/>
+      <text x="480" y="56" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">CLASSE</text>
+      <rect x="360" y="70" width="240" height="36" fill="#fff" stroke="#cbd5e1"/>
+      <text x="480" y="93" text-anchor="middle" font-size="13" fill="#1e293b"><tspan font-weight="bold" fill="#b91c1c">CodClasse</tspan> · Aula</text>
+      <rect x="360" y="106" width="240" height="30" fill="#f8fafc" stroke="#cbd5e1"/><text x="480" y="126" text-anchor="middle" font-size="12" fill="#475569">4B · Aula 12</text>
+      <rect x="360" y="136" width="240" height="30" fill="#fff" stroke="#cbd5e1"/><text x="480" y="156" text-anchor="middle" font-size="12" fill="#475569">4A · Aula 7</text>
+      <path d="M280 121 q40 0 60 -30 l20 0" stroke="#4338ca" stroke-width="3.5" fill="none" stroke-dasharray="7 4"/>
+      <text x="320" y="200" text-anchor="middle" font-size="14" fill="#4338ca" font-weight="bold">chiave esterna: il "filo" che collega le tabelle 🔗</text>
+    </svg>
+    <div class="titolone" style="font-size:2.4em;">IL MODELLO RELAZIONALE</div>
+    <div class="sottotitolo">Guida di studio — Quarto anno · La progettazione logica</div>
+    <p style="margin-top:22px; font-size:1.2em;">Tabelle, tuple e domini · Chiavi primarie ed esterne · Vincoli di integrità<br>Le regole di derivazione da E-R a relazionale · Esercizi</p>
+    <p style="margin-top:24px; color:var(--grigio);">Usa le frecce ⬅ ➡ della tastiera o i pulsanti in basso per navigare</p>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 : INDICE ============ -->
+<section class="slide">
+  <h1>📚 Cosa impareremo</h1>
+  <div class="cols">
+    <div>
+      <div class="box"><h2>1️⃣ Il modello relazionale</h2><p>Relazioni = tabelle: tuple, attributi, domini, grado e cardinalità.</p></div>
+      <div class="box"><h2>2️⃣ Le chiavi</h2><p>Chiavi candidate, chiave primaria (PK) e la protagonista assoluta: la chiave esterna (FK).</p></div>
+      <div class="box"><h2>3️⃣ I vincoli di integrità</h2><p>Di dominio, di entità e soprattutto il vincolo di <b>integrità referenziale</b>.</p></div>
+    </div>
+    <div>
+      <div class="box"><h2>4️⃣ Le regole di derivazione</h2><p>Da E-R a tabelle: entità, associazioni 1:1, 1:N, N:N (tabella ponte!) e gerarchie IS-A.</p></div>
+      <div class="box"><h2>5️⃣ Esercizio guida</h2><p>Dallo schema E-R "azienda" del terzo anno allo schema logico completo, passo per passo.</p></div>
+      <div class="box"><h2>6️⃣ Palestra 💪</h2><p>Esercizi interattivi, quiz e tracce di derivazione con soluzioni a scomparsa.</p></div>
+    </div>
+  </div>
+  <div class="nota"><b>📌 Il ponte con l'anno scorso:</b> il modello E-R diceva <b>COSA</b> rappresentare. Il modello relazionale dice <b>COME</b> organizzarlo in tabelle. È la seconda fase della progettazione: quella <b>logica</b>.</div>
+</section>
+
+<!-- ============ SLIDE 3 : DAL CONCETTUALE AL LOGICO ============ -->
+<section class="slide">
+  <span class="badge">INTRODUZIONE</span>
+  <h1>🌉 Dal modello E-R al modello relazionale</h1>
+  <svg viewBox="0 0 780 190" width="740">
+    <rect x="20" y="30" width="300" height="130" rx="14" fill="#dbeafe" stroke="#1e3a8a" stroke-width="3"/>
+    <text x="170" y="60" text-anchor="middle" font-size="16" fill="#1e3a8a" font-weight="bold">SCHEMA E-R (concettuale)</text>
+    <rect x="45" y="80" width="90" height="38" rx="3" fill="#fff" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="90" y="104" text-anchor="middle" font-size="12" fill="#1e3a8a" font-weight="bold">Studente</text>
+    <polygon points="185,80 225,99 185,118 145,99" fill="#fdf2ff" stroke="#c026d3" stroke-width="2"/>
+    <rect x="230" y="80" width="80" height="38" rx="3" fill="#fff" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="270" y="104" text-anchor="middle" font-size="12" fill="#1e3a8a" font-weight="bold">Classe</text>
+    <path d="M330 95 h95 l-16 -12 m16 12 l-16 12" stroke="#f97316" stroke-width="6" fill="none"/>
+    <text x="378" y="70" text-anchor="middle" font-size="14" fill="#f97316" font-weight="bold">regole di</text>
+    <text x="378" y="130" text-anchor="middle" font-size="14" fill="#f97316" font-weight="bold">derivazione</text>
+    <rect x="440" y="30" width="320" height="130" rx="14" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+    <text x="600" y="60" text-anchor="middle" font-size="16" fill="#5b21b6" font-weight="bold">SCHEMA LOGICO (relazionale)</text>
+    <rect x="465" y="80" width="130" height="24" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="530" y="97" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="Consolas" font-weight="bold">Studente(...)</text>
+    <rect x="465" y="112" width="130" height="24" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="530" y="129" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="Consolas" font-weight="bold">Classe(...)</text>
+    <rect x="615" y="95" width="125" height="24" fill="#fff" stroke="#4338ca" stroke-width="2" stroke-dasharray="5 3"/>
+    <text x="677" y="112" text-anchor="middle" font-size="11" fill="#4338ca" font-family="Consolas" font-weight="bold">FK 🔗</text>
+  </svg>
+  <p>Il passaggio non è creativo ma <b>meccanico</b>: esistono <b>regole precise</b> (le regole di derivazione o mapping) che trasformano ogni pezzo dello schema E-R in tabelle. Impararle = saper tradurre <b>qualsiasi</b> progetto in un database reale.</p>
+  <div class="curiosita"><b>🔎 Curiosità:</b> il modello relazionale fu inventato nel <b>1970</b> da <b>Edgar F. Codd</b>, ricercatore IBM, in un articolo che rivoluzionò l'informatica. I DBMS relazionali (Oracle, MySQL, PostgreSQL…) dominano il mondo da 50 anni.</div>
+</section>
+
+<!-- ============ SLIDE 4 : ANATOMIA DELLA TABELLA ============ -->
+<section class="slide">
+  <span class="badge">IL MODELLO</span>
+  <h1>🔬 Anatomia di una relazione (tabella)</h1>
+  <svg viewBox="0 0 800 300" width="760">
+    <rect x="120" y="40" width="480" height="40" rx="6" fill="#1e3a8a"/>
+    <text x="200" y="66" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">Matricola</text>
+    <text x="360" y="66" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">Cognome</text>
+    <text x="520" y="66" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">DataNascita</text>
+    <g font-size="14" fill="#1e293b">
+      <rect x="120" y="80" width="480" height="36" fill="#fff" stroke="#cbd5e1"/>
+      <text x="200" y="103" text-anchor="middle">1024</text><text x="360" y="103" text-anchor="middle">Bianchi</text><text x="520" y="103" text-anchor="middle">12/03/2008</text>
+      <rect x="120" y="116" width="480" height="36" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="200" y="139" text-anchor="middle">1025</text><text x="360" y="139" text-anchor="middle">Verdi</text><text x="520" y="139" text-anchor="middle">30/11/2007</text>
+      <rect x="120" y="152" width="480" height="36" fill="#fff" stroke="#cbd5e1"/>
+      <text x="200" y="175" text-anchor="middle">1026</text><text x="360" y="175" text-anchor="middle">Rossi</text><text x="520" y="175" text-anchor="middle">05/06/2008</text>
+    </g>
+    <rect x="112" y="116" width="496" height="36" fill="none" stroke="#dc2626" stroke-width="3" rx="6"/>
+    <text x="700" y="139" font-size="14" fill="#dc2626" font-weight="bold">TUPLA (riga)</text>
+    <path d="M360 30 v-12" stroke="#16a34a" stroke-width="3"/>
+    <text x="360" y="12" text-anchor="middle" font-size="14" fill="#16a34a" font-weight="bold">ATTRIBUTO (colonna)</text>
+    <text x="60" y="105" text-anchor="middle" font-size="13" fill="#7c3aed" font-weight="bold">GRADO = 3</text>
+    <text x="60" y="125" text-anchor="middle" font-size="11" fill="#7c3aed">(n° colonne)</text>
+    <text x="60" y="165" text-anchor="middle" font-size="13" fill="#c026d3" font-weight="bold">CARDINALITÀ = 3</text>
+    <text x="60" y="185" text-anchor="middle" font-size="11" fill="#c026d3">(n° righe)</text>
+    <text x="360" y="225" text-anchor="middle" font-size="14" fill="#475569">DOMINIO di DataNascita = insieme delle date valide · dominio di Matricola = interi positivi</text>
+    <text x="360" y="260" text-anchor="middle" font-size="15" fill="#1e3a8a" font-weight="bold" font-family="Consolas">Notazione: Studente(Matricola, Cognome, DataNascita)</text>
+  </svg>
+  <div class="nota"><b>📌 Dizionario rapido:</b> relazione = tabella · tupla = riga = record · attributo = colonna = campo · dominio = tipi/valori ammessi per una colonna.</div>
+</section>
+
+<!-- ============ SLIDE 5 : PROPRIETÀ ============ -->
+<section class="slide">
+  <span class="badge">IL MODELLO</span>
+  <h1>📜 Le proprietà delle relazioni</h1>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>Non possono esistere <b>due tuple identiche</b> (per questo serve la chiave!)</li>
+        <li>L'<b>ordine</b> delle righe e delle colonne è <b>irrilevante</b></li>
+        <li>Ogni attributo ha un <b>nome unico</b> nella tabella</li>
+        <li>Ogni valore è <b>atomico</b>: una cella contiene UN valore, non elenchi!</li>
+      </ul>
+      <div class="esempio"><b>💡 "Atomico" alla prova:</b> la cella Telefono con "333-1234567; 06-555444" è <b>sbagliata</b>: due valori in una cella. Soluzione? Una tabella separata per i telefoni (ricordi gli attributi multipli dell'E-R?).</div>
+    </div>
+    <div>
+      <table>
+        <tr><th colspan="3">🚫 Tabella NON valida</th></tr>
+        <tr><th>Matricola</th><th>Cognome</th><th>Telefoni</th></tr>
+        <tr><td>1024</td><td>Bianchi</td><td style="color:#dc2626;">333-111, 06-222 ✗</td></tr>
+        <tr><td>1024</td><td style="color:#dc2626;">Bianchi ✗ (duplicata)</td><td>333-111</td></tr>
+      </table>
+      <table>
+        <tr><th colspan="2">✅ Soluzione: tabella Telefono</th></tr>
+        <tr><th>Matricola</th><th>Numero</th></tr>
+        <tr><td>1024</td><td>333-111</td></tr>
+        <tr><td>1024</td><td>06-222</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 6 : PK ============ -->
+<section class="slide">
+  <span class="badge">LE CHIAVI</span>
+  <h1>🔑 La chiave primaria (PK)</h1>
+  <div class="cols">
+    <div>
+      <p>Come nell'E-R: tra le <b>chiavi candidate</b> (insiemi minimi di attributi che identificano univocamente le tuple) si sceglie la <b>chiave primaria</b> (<i>Primary Key</i>).</p>
+      <ul>
+        <li>Si indica <b>sottolineata</b> nella notazione: <span class="mono">Studente(<u>Matricola</u>, Cognome, …)</span></li>
+        <li><b>Mai NULL</b>, mai duplicata (vincolo di integrità <b>di entità</b>)</li>
+        <li>Può essere <b>composta</b>: più attributi insieme</li>
+      </ul>
+      <div class="curiosita"><b>🔎 In pratica:</b> spesso si aggiunge un <b>ID numerico auto-incrementale</b> (1, 2, 3…) come PK "artificiale": semplice, stabile, veloce. Lo ritroverai in Supabase!</div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 360 210" width="330">
+        <rect x="30" y="30" width="300" height="38" rx="6" fill="#1e3a8a"/>
+        <text x="105" y="55" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">Matricola 🔑</text>
+        <text x="255" y="55" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">Cognome</text>
+        <rect x="30" y="68" width="300" height="34" fill="#fff" stroke="#cbd5e1"/>
+        <text x="105" y="90" text-anchor="middle" font-size="13">1024</text><text x="255" y="90" text-anchor="middle" font-size="13">Bianchi</text>
+        <rect x="30" y="102" width="300" height="34" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="105" y="124" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">1024 ✗</text><text x="255" y="124" text-anchor="middle" font-size="13">Rossi</text>
+        <rect x="30" y="136" width="300" height="34" fill="#fff" stroke="#cbd5e1"/>
+        <text x="105" y="158" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">NULL ✗</text><text x="255" y="158" text-anchor="middle" font-size="13">Verdi</text>
+        <text x="180" y="195" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">PK duplicata o nulla: il DBMS rifiuta la riga!</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 7 : FK ============ -->
+<section class="slide">
+  <span class="badge">LE CHIAVI</span>
+  <h1>🔗 La chiave esterna (FK): il collante del database</h1>
+  <div class="cols">
+    <div>
+      <p>Una <b>chiave esterna</b> (<i>Foreign Key</i>) è un attributo (o gruppo di attributi) di una tabella che <b>contiene i valori della chiave primaria di un'altra tabella</b>, creando il collegamento.</p>
+      <div class="esempio"><b>💡 Esempio:</b> nella tabella Studente, la colonna <span class="mono">CodClasse</span> contiene valori presi dalla PK della tabella Classe: ogni studente "punta" alla sua classe. CodClasse è FK verso Classe.</div>
+      <p>Nella notazione la segnaliamo con un asterisco o "FK":<br><span class="mono">Studente(<u>Matricola</u>, Cognome, CodClasse*)</span></p>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 420 240" width="390">
+        <rect x="15" y="30" width="210" height="36" rx="6" fill="#1e3a8a"/>
+        <text x="70" y="54" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Matricola 🔑</text>
+        <text x="160" y="54" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">CodClasse 🔗</text>
+        <rect x="15" y="66" width="210" height="30" fill="#fff" stroke="#cbd5e1"/>
+        <text x="70" y="86" text-anchor="middle" font-size="12">1024</text><text x="160" y="86" text-anchor="middle" font-size="12" fill="#4338ca" font-weight="bold">4B</text>
+        <rect x="15" y="96" width="210" height="30" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="70" y="116" text-anchor="middle" font-size="12">1025</text><text x="160" y="116" text-anchor="middle" font-size="12" fill="#4338ca" font-weight="bold">4A</text>
+        <text x="120" y="150" text-anchor="middle" font-size="12" fill="#475569" font-weight="bold">STUDENTE</text>
+        <rect x="285" y="30" width="120" height="36" rx="6" fill="#7c3aed"/>
+        <text x="345" y="54" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">CodClasse 🔑</text>
+        <rect x="285" y="66" width="120" height="30" fill="#fff" stroke="#cbd5e1"/>
+        <text x="345" y="86" text-anchor="middle" font-size="12" font-weight="bold">4A</text>
+        <rect x="285" y="96" width="120" height="30" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="345" y="116" text-anchor="middle" font-size="12" font-weight="bold">4B</text>
+        <text x="345" y="150" text-anchor="middle" font-size="12" fill="#475569" font-weight="bold">CLASSE</text>
+        <path d="M225 81 q30 -18 58 -8" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <path d="M225 111 q35 15 60 -18" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <text x="210" y="200" text-anchor="middle" font-size="13" fill="#4338ca" font-weight="bold">ogni valore di FK "punta" a una PK esistente</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 8 : VINCOLI ============ -->
+<section class="slide">
+  <span class="badge">I VINCOLI</span>
+  <h1>🛡️ I vincoli di integrità del modello relazionale</h1>
+  <table style="font-size:1.05em;">
+    <tr><th>Vincolo</th><th>Cosa impone</th><th>Esempio di violazione</th></tr>
+    <tr><td><b>Di dominio</b></td><td>i valori rispettano il tipo/intervallo della colonna</td><td>Voto = "ciao" · Età = −5</td></tr>
+    <tr><td><b>Di entità</b></td><td>la PK non è mai NULL né duplicata</td><td>due studenti con matricola 1024</td></tr>
+    <tr><td><b>Di integrità referenziale</b></td><td>ogni valore di FK esiste come PK nella tabella riferita</td><td>studente nella classe "9Z"… che non esiste!</td></tr>
+  </table>
+  <div class="nota"><b>📌 Chi fa la guardia?</b> Il <b>DBMS</b>: se dichiari i vincoli, ogni tentativo di inserimento/modifica che li viola viene <b>rifiutato automaticamente</b>. Il database si difende da solo — e nella guida Supabase lo vedrai succedere in diretta!</div>
+</section>
+
+<!-- ============ SLIDE 9 : REFERENZIALE IN DETTAGLIO ============ -->
+<section class="slide">
+  <span class="badge">I VINCOLI</span>
+  <h1>🚨 Il vincolo di integrità referenziale in azione</h1>
+  <div class="cols">
+    <div>
+      <p>Il vincolo dice: <b>ogni valore della chiave esterna deve esistere come valore della chiave primaria riferita</b> (oppure essere NULL, se ammesso).</p>
+      <h2>Le tre situazioni pericolose</h2>
+      <ul>
+        <li><b>Inserire</b> uno studente con CodClasse "9Z" (classe inesistente) → ❌ rifiutato</li>
+        <li><b>Cancellare</b> la classe 4B mentre ha ancora studenti → ❌ rifiutato (o gestito)</li>
+        <li><b>Modificare</b> la PK di 4B in "4Z" lasciando gli studenti a "4B" → ❌ rifiutato (o propagato)</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Le politiche di reazione</h2>
+      <table>
+        <tr><th>Politica</th><th>Alla cancellazione del padre…</th></tr>
+        <tr><td class="mono">RESTRICT</td><td>vieta se ci sono figli collegati</td></tr>
+        <tr><td class="mono">CASCADE</td><td>cancella "a cascata" anche i figli</td></tr>
+        <tr><td class="mono">SET NULL</td><td>mette NULL nelle FK dei figli</td></tr>
+      </table>
+      <div class="esempio"><b>💡 Quale scegliere?</b> Dipende dalla realtà: cancello un cliente → CASCADE sui suoi telefoni (senza cliente non hanno senso), ma RESTRICT sui suoi ordini (guai a perdere la contabilità!).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 10 : PANORAMICA REGOLE ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>🧭 Le regole di derivazione: la mappa</h1>
+  <p>Ecco la "tabella di marcia" per tradurre qualunque schema E-R. Le vedremo una per una:</p>
+  <table style="font-size:1.06em;">
+    <tr><th>Elemento E-R</th><th>Diventa…</th><th>Regola-chiave</th></tr>
+    <tr><td><b>Entità</b></td><td>una tabella</td><td>attributi → colonne, chiave → PK</td></tr>
+    <tr><td><b>Attributo composto</b></td><td>colonne separate</td><td>Indirizzo → Via, Civico, Città…</td></tr>
+    <tr><td><b>Attributo multiplo</b></td><td>una tabella in più</td><td>con FK verso l'entità</td></tr>
+    <tr><td><b>Associazione 1:1</b></td><td>FK in una delle due tabelle</td><td>meglio nel lato a partecipazione totale (1,1)</td></tr>
+    <tr><td><b>Associazione 1:N</b></td><td>FK nella tabella lato N</td><td>"la PK del lato 1 migra nel lato N"</td></tr>
+    <tr><td><b>Associazione N:N</b></td><td>una <b>terza tabella</b> (ponte)</td><td>PK composta dalle due FK</td></tr>
+    <tr><td><b>Gerarchia IS-A</b></td><td>varie strategie</td><td>la più robusta: tabelle separate con PK=FK</td></tr>
+  </table>
+  <div class="nota"><b>📌 Da stampare nel cervello:</b> 1:N → <b>FK nel lato N</b> · N:N → <b>tabella ponte</b>. Queste due regole risolvono l'80% degli esercizi.</div>
+</section>
+
+<!-- ============ SLIDE 11 : REGOLA ENTITÀ ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>1️⃣ Entità → tabella</h1>
+  <div class="cols">
+    <div>
+      <p>Ogni <b>entità</b> diventa una <b>tabella</b>:</p>
+      <ul>
+        <li>gli attributi diventano <b>colonne</b> (con un tipo di dato)</li>
+        <li>la chiave dell'entità diventa la <b>PK</b></li>
+        <li>gli attributi <b>composti</b> si "appiattiscono" in più colonne</li>
+        <li>gli attributi <b>derivati</b> non si memorizzano</li>
+      </ul>
+      <div class="schema">Cliente(<u>CF</u>, Nome, Cognome, Via, Civico, Città)</div>
+    </div>
+    <div>
+      <h2>E gli attributi multipli?</h2>
+      <p>Un attributo multiplo (es. più Telefoni) <b>non può</b> stare in una cella (valori atomici!) → tabella dedicata con FK:</p>
+      <div class="schema">Telefono(<u>Numero</u>, <span class="fk">CF*</span>)</div>
+      <div class="esempio"><b>💡 Nota il pattern:</b> l'attributo multiplo si comporta come una "mini-entità" legata 1:N al proprietario: infatti la FK va… dal lato N! La regola successiva è già qui.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 12 : REGOLA 1:1 ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>2️⃣ Associazione 1:1 → FK in una delle due</h1>
+  <div class="cols">
+    <div>
+      <p><b>Esempio:</b> un Direttore dirige al più un Dipartimento (0,1); ogni Dipartimento ha esattamente un Direttore (1,1).</p>
+      <p><b>Regola:</b> due tabelle; la PK di una migra come <b>FK nell'altra</b>. <b>Dove?</b> Nel lato a partecipazione <b>totale (1,1)</b>: così la FK non è mai NULL.</p>
+      <div class="schema">Direttore(<u>IDDirettore</u>, Nome)
+Dipartimento(<u>CodDip</u>, NomeDip, <span class="fk">IDDirettore*</span>)</div>
+      <p style="font-size:.98em; color:var(--grigio);">Ogni dipartimento DEVE avere un direttore → FK in Dipartimento: mai NULL. ✓</p>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 420 210" width="380">
+        <rect x="20" y="20" width="170" height="36" rx="6" fill="#1e3a8a"/><text x="105" y="44" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">DIRETTORE</text>
+        <rect x="20" y="56" width="170" height="30" fill="#fff" stroke="#cbd5e1"/><text x="105" y="76" text-anchor="middle" font-size="12"><tspan fill="#b91c1c" font-weight="bold">D1</tspan> · Ferrari</text>
+        <rect x="230" y="20" width="170" height="36" rx="6" fill="#7c3aed"/><text x="315" y="44" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">DIPARTIMENTO</text>
+        <rect x="230" y="56" width="170" height="30" fill="#fff" stroke="#cbd5e1"/><text x="315" y="76" text-anchor="middle" font-size="12"><tspan fill="#b91c1c" font-weight="bold">R01</tspan> · Vendite · <tspan fill="#4338ca" font-weight="bold">D1</tspan></text>
+        <path d="M190 71 h40" stroke="#4338ca" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="210" y="130" text-anchor="middle" font-size="0">.</text>
+        <text x="210" y="140" text-anchor="middle" font-size="13" fill="#475569">1 direttore ↔ 1 dipartimento</text>
+        <text x="210" y="170" text-anchor="middle" font-size="13" fill="#16a34a" font-weight="bold">FK nel lato (1,1) = niente NULL</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 13 : REGOLA 1:N ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>3️⃣ Associazione 1:N → FK nel lato N</h1>
+  <div class="cols">
+    <div>
+      <p><b>La regola d'oro del modello relazionale:</b></p>
+      <div class="box center" style="border:3px solid var(--arancio);">
+        <p style="font-size:1.2em;"><b>La chiave primaria del lato "1"<br>migra come chiave esterna nel lato "N"</b></p>
+      </div>
+      <p><b>Esempio:</b> un'Azienda impiega molti Dipendenti; ogni Dipendente lavora per una sola Azienda.</p>
+      <div class="schema">Azienda(<u>PIVA</u>, RagioneSociale)
+Dipendente(<u>Matricola</u>, Cognome, <span class="fk">PIVA*</span>)</div>
+      <p style="font-size:.98em;">Eventuali <b>attributi dell'associazione</b> (es. DataAssunzione) vanno anch'essi nella tabella lato N.</p>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 420 230" width="390">
+        <rect x="130" y="15" width="160" height="36" rx="6" fill="#1e3a8a"/><text x="210" y="39" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">AZIENDA (lato 1)</text>
+        <rect x="130" y="51" width="160" height="30" fill="#fff" stroke="#cbd5e1"/><text x="210" y="71" text-anchor="middle" font-size="12"><tspan fill="#b91c1c" font-weight="bold">IT111</tspan> · TechSpa</text>
+        <rect x="20" y="140" width="180" height="36" rx="6" fill="#7c3aed"/><text x="110" y="164" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">DIPENDENTE (lato N)</text>
+        <rect x="20" y="176" width="180" height="28" fill="#fff" stroke="#cbd5e1"/><text x="110" y="195" text-anchor="middle" font-size="11">M1 · Rossi · <tspan fill="#4338ca" font-weight="bold">IT111</tspan></text>
+        <rect x="220" y="140" width="180" height="36" rx="6" fill="#7c3aed"/><text x="310" y="164" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">DIPENDENTE (lato N)</text>
+        <rect x="220" y="176" width="180" height="28" fill="#fff" stroke="#cbd5e1"/><text x="310" y="195" text-anchor="middle" font-size="11">M2 · Verdi · <tspan fill="#4338ca" font-weight="bold">IT111</tspan></text>
+        <path d="M190 81 q-60 30 -85 58" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <path d="M235 81 q60 30 80 58" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <text x="210" y="225" text-anchor="middle" font-size="13" fill="#4338ca" font-weight="bold">molti figli puntano allo stesso padre</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 14 : REGOLA N:N ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>4️⃣ Associazione N:N → la tabella ponte</h1>
+  <div class="cols">
+    <div>
+      <p>Le tabelle relazionali <b>non sanno</b> rappresentare direttamente un N:N: serve una <b>terza tabella</b> (detta <b>ponte</b> o di associazione):</p>
+      <ul>
+        <li>contiene le <b>FK verso entrambe</b> le entità</li>
+        <li>la sua PK è <b>composta</b>: l'unione delle due FK</li>
+        <li>gli <b>attributi dell'associazione</b> (Voto!) finiscono qui</li>
+      </ul>
+      <div class="schema">Studente(<u>Matricola</u>, Nome)
+Corso(<u>CodCorso</u>, Titolo)
+Esame(<u><span class="fk">Matricola*</span>, <span class="fk">CodCorso*</span></u>, Voto)</div>
+    </div>
+    <div class="center">
+      <svg viewBox="0 0 440 250" width="410">
+        <rect x="20" y="20" width="150" height="34" rx="6" fill="#1e3a8a"/><text x="95" y="42" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">STUDENTE</text>
+        <rect x="20" y="54" width="150" height="28" fill="#fff" stroke="#cbd5e1"/><text x="95" y="73" text-anchor="middle" font-size="11"><tspan fill="#b91c1c" font-weight="bold">1024</tspan> · Bianchi</text>
+        <rect x="270" y="20" width="150" height="34" rx="6" fill="#1e3a8a"/><text x="345" y="42" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">CORSO</text>
+        <rect x="270" y="54" width="150" height="28" fill="#fff" stroke="#cbd5e1"/><text x="345" y="73" text-anchor="middle" font-size="11"><tspan fill="#b91c1c" font-weight="bold">INF1</tspan> · Database</text>
+        <rect x="120" y="150" width="200" height="34" rx="6" fill="#c026d3"/><text x="220" y="172" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">ESAME (ponte)</text>
+        <rect x="120" y="184" width="200" height="28" fill="#fff" stroke="#cbd5e1"/><text x="220" y="203" text-anchor="middle" font-size="11"><tspan fill="#4338ca" font-weight="bold">1024</tspan> · <tspan fill="#4338ca" font-weight="bold">INF1</tspan> · voto 8</text>
+        <path d="M95 82 q20 50 80 72" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <path d="M345 82 q-20 50 -80 72" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+        <text x="220" y="240" text-anchor="middle" font-size="13" fill="#c026d3" font-weight="bold">PK composta = (Matricola, CodCorso): la coppia non si ripete</text>
+      </svg>
+    </div>
+  </div>
+  <div class="nota"><b>📌 Perché la PK composta?</b> Perché lo studente 1024 non può avere <b>due</b> voti per lo stesso corso INF1. Se invece potesse ripetere l'esame… aggiungeremmo la Data alla PK. La PK racconta le regole della realtà!</div>
+</section>
+
+<!-- ============ SLIDE 15 : REGOLA IS-A ============ -->
+<section class="slide">
+  <span class="badge">REGOLE DI DERIVAZIONE</span>
+  <h1>5️⃣ Gerarchie IS-A → tabelle con PK=FK</h1>
+  <div class="cols">
+    <div>
+      <p><b>Strategia più robusta — mantenimento della gerarchia:</b> una tabella per il padre (attributi comuni) e una per ogni figlio (attributi specifici). La PK dei figli è <b>la stessa del padre</b> e funge <b>contemporaneamente da PK e FK</b>.</p>
+      <div class="schema">Persona(<u>CF</u>, NomeCognome)
+Cliente(<u><span class="fk">CF*</span></u>, PuntiFedeltà)
+Impiegato(<u><span class="fk">CF*</span></u>, Stipendio)</div>
+    </div>
+    <div>
+      <h2>Le alternative (cenni)</h2>
+      <table style="font-size:.98em;">
+        <tr><th>Strategia</th><th>Quando conviene</th></tr>
+        <tr><td><b>Tabella unica</b> (padre + tutti gli attributi dei figli, con NULL)</td><td>pochi attributi specifici, copertura sovrapposta</td></tr>
+        <tr><td><b>Solo tabelle figlie</b> (attributi del padre ripetuti in ciascuna)</td><td>copertura totale ed esclusiva</td></tr>
+        <tr><td><b>Tabelle separate PK=FK</b> ⭐</td><td>caso generale: la più pulita</td></tr>
+      </table>
+      <div class="esempio"><b>💡 Come leggerla:</b> per sapere tutto dell'impiegato Rossi faccio il "join": la riga di Impiegato con CF=RSSMRA… si aggancia alla riga di Persona con lo stesso CF.</div>
+    </div>
+  </div>
+</section>
+<!-- ============ SLIDE 16 : ESERCIZIO GUIDA ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZIO GUIDA</span>
+  <h1>🏢 Esercizio guida: dall'E-R "azienda" allo schema logico</h1>
+  <p>Riprendiamo lo schema E-R dell'azienda (guida anno 3): Dipendente, Reparto, Figlio; associazioni "È genitore di" (1:N), "Gestisce" (1:1), "Lavora in" (1:N).</p>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div><b>Entità → tabelle.</b> Tre tabelle: Dipendente, Reparto, Figlio, con le loro PK.</div></div>
+      <div class="passo"><div class="num">2</div><div><b>Lavora in (1:N):</b> la PK di Reparto migra in Dipendente → colonna <span class="mono">NumReparto*</span>.</div></div>
+      <div class="passo"><div class="num">3</div><div><b>È genitore di (1:N):</b> la PK di Dipendente migra in Figlio → colonna <span class="mono">CFGenitore*</span> (entra anche nella PK di Figlio: entità debole!).</div></div>
+      <div class="passo"><div class="num">4</div><div><b>Gestisce (1:1):</b> FK nel lato a partecipazione più stretta: <span class="mono">CFGestore*</span> in Reparto (può essere NULL: "al più un gestore").</div></div>
+    </div>
+    <div>
+      <h2>Lo schema logico completo</h2>
+      <div class="schema">Dipendente(<u>CF</u>, Stipendio, Telefono,
+           <span class="fk">NumReparto*</span>)
+Reparto(<u>NumReparto</u>, NomeReparto,
+        <span class="fk">CFGestore*</span>)
+Figlio(<u>Nome, <span class="fk">CFGenitore*</span></u>, Età)</div>
+      <div class="nota"><b>📌 Conta le FK:</b> 3 associazioni → 3 chiavi esterne. Nessuna N:N → nessuna tabella ponte. Se ci fosse stata (es. Dipendente–Progetto), avremmo aggiunto una quarta tabella.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 17 : NOTAZIONE E CHECK ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZIO GUIDA</span>
+  <h1>✅ Il collaudo dello schema logico</h1>
+  <div class="cols">
+    <div>
+      <h2>La checklist del progettista</h2>
+      <ul>
+        <li>Ogni <b>entità</b> ha la sua tabella? ✓</li>
+        <li>Ogni tabella ha una <b>PK sottolineata</b>? ✓</li>
+        <li>Ogni <b>1:N</b> ha la FK <b>nel lato N</b>? ✓</li>
+        <li>Ogni <b>N:N</b> ha la sua <b>tabella ponte</b> con PK composta? ✓</li>
+        <li>Gli <b>attributi di associazione</b> sono finiti nel posto giusto (lato N o ponte)? ✓</li>
+        <li>Attributi <b>composti</b> appiattiti, <b>multipli</b> in tabella separata, <b>derivati</b> eliminati? ✓</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Prova con dati veri!</h2>
+      <p>Il collaudo migliore: inserisci <b>2-3 righe di fantasia</b> in ogni tabella e verifica di poter rispondere alle domande della traccia.</p>
+      <div class="esempio"><b>💡 "Chi sono i figli dei dipendenti del reparto Vendite?"</b><br>
+      Reparto(Vendite) → Dipendente con NumReparto=Vendite → Figlio con CFGenitore=…<br>
+      Se riesci a "navigare" le FK con il dito, lo schema funziona. 👆</div>
+      <div class="curiosita"><b>🔎 Anteprima SQL:</b> questa "navigazione col dito" in SQL si chiamerà <b>JOIN</b>. Lo schema logico ben fatto rende i JOIN naturali.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 18 : INTERATTIVI FK ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI INTERATTIVI</span>
+  <h1>✏️ Allenamento: dove va la chiave esterna?</h1>
+  <p>Scrivi il <b>nome della tabella</b> in cui va inserita la FK (o "ponte" se serve una terza tabella).</p>
+  <div class="eser"><span class="dom">1) Classe (1) – Studente (N): FK in…</span><input id="a1" placeholder="tabella"><button onclick="verifica('a1','studente','fa1')">Verifica</button><span class="fb" id="fa1"></span></div>
+  <div class="eser"><span class="dom">2) Cliente (N) – DVD (N), noleggio: FK in…</span><input id="a2" placeholder="tabella"><button onclick="verifica('a2','ponte|tabellaponte','fa2')">Verifica</button><span class="fb" id="fa2"></span></div>
+  <div class="eser"><span class="dom">3) Regista (1) – Film (N): FK in…</span><input id="a3" placeholder="tabella"><button onclick="verifica('a3','film','fa3')">Verifica</button><span class="fb" id="fa3"></span></div>
+  <div class="eser"><span class="dom">4) Comune (1,1) – Sindaco (1,1): FK preferibilmente in…</span><input id="a4" placeholder="tabella"><button onclick="verifica('a4','comune','fa4')">Verifica</button><span class="fb" id="fa4"></span></div>
+  <div class="eser"><span class="dom">5) Libro (N) – Autore (N): FK in…</span><input id="a5" placeholder="tabella"><button onclick="verifica('a5','ponte|tabellaponte','fa5')">Verifica</button><span class="fb" id="fa5"></span></div>
+  <div class="nota"><b>📌 Sul n° 4:</b> il Comune ha sempre un sindaco (partecipazione totale) mentre una persona può non essere sindaco: FK in Comune → mai NULL.</div>
+</section>
+
+<!-- ============ SLIDE 19 : INTERATTIVI CONTA TABELLE ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI INTERATTIVI</span>
+  <h1>✏️ Allenamento: quante tabelle servono?</h1>
+  <p>Scrivi il <b>numero totale di tabelle</b> dello schema logico risultante.</p>
+  <div class="eser"><span class="dom">1) Squadra (1) – Giocatore (N)</span><input id="b1" placeholder="numero"><button onclick="verifica('b1','2','fb1')">Verifica</button><span class="fb" id="fb1"></span></div>
+  <div class="eser"><span class="dom">2) Studente (N) – Corso (N)</span><input id="b2" placeholder="numero"><button onclick="verifica('b2','3','fb2')">Verifica</button><span class="fb" id="fb2"></span></div>
+  <div class="eser"><span class="dom">3) Cliente con attributo multiplo Telefono (0,N)</span><input id="b3" placeholder="numero"><button onclick="verifica('b3','2','fb3')">Verifica</button><span class="fb" id="fb3"></span></div>
+  <div class="eser"><span class="dom">4) Persona padre di gerarchia con figli Cliente e Impiegato (tabelle separate)</span><input id="b4" placeholder="numero"><button onclick="verifica('b4','3','fb4')">Verifica</button><span class="fb" id="fb4"></span></div>
+  <div class="eser"><span class="dom">5) Attore (N) – Film (N) e Film (N) – Regista (1)</span><input id="b5" placeholder="numero"><button onclick="verifica('b5','4','fb5')">Verifica</button><span class="fb" id="fb5"></span></div>
+  <div class="nota"><b>📌 Sul n° 5:</b> Attore + Film + Regista + ponte Attore-Film = 4. La 1:N Regista-Film non crea tabelle: solo una FK in Film!</div>
+</section>
+
+<!-- ============ SLIDE 20 : QUIZ ============ -->
+<section class="slide">
+  <span class="badge">ESERCIZI INTERATTIVI</span>
+  <h1>🎯 Quiz sul modello relazionale</h1>
+  <div class="cols">
+    <div>
+      <div class="quiz">
+        <p>1) Nel modello relazionale, una tupla è…</p>
+        <label onclick="quizRispondi(this,false)">una colonna</label>
+        <label onclick="quizRispondi(this,true)" data-ok>una riga della tabella</label>
+        <label onclick="quizRispondi(this,false)">un tipo di dato</label>
+      </div>
+      <div class="quiz">
+        <p>2) Il vincolo di integrità referenziale garantisce che…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>ogni FK punti a una PK esistente</label>
+        <label onclick="quizRispondi(this,false)">le righe siano ordinate</label>
+        <label onclick="quizRispondi(this,false)">la PK sia un numero</label>
+      </div>
+      <div class="quiz">
+        <p>3) La PK della tabella ponte di una N:N è…</p>
+        <label onclick="quizRispondi(this,false)">un ID inventato, obbligatoriamente</label>
+        <label onclick="quizRispondi(this,true)" data-ok>composta dalle FK delle due entità</label>
+        <label onclick="quizRispondi(this,false)">non serve una PK</label>
+      </div>
+    </div>
+    <div>
+      <div class="quiz">
+        <p>4) ON DELETE CASCADE significa che cancellando il padre…</p>
+        <label onclick="quizRispondi(this,false)">la cancellazione viene vietata</label>
+        <label onclick="quizRispondi(this,true)" data-ok>si cancellano anche le righe figlie collegate</label>
+        <label onclick="quizRispondi(this,false)">le FK diventano NULL</label>
+      </div>
+      <div class="quiz">
+        <p>5) In una gerarchia IS-A (tabelle separate), la PK della tabella figlia…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>coincide con la PK del padre ed è anche FK</label>
+        <label onclick="quizRispondi(this,false)">è sempre un nuovo codice</label>
+        <label onclick="quizRispondi(this,false)">non esiste</label>
+      </div>
+      <div class="quiz">
+        <p>6) "Una cella non può contenere un elenco di valori" è la proprietà di…</p>
+        <label onclick="quizRispondi(this,false)">cardinalità</label>
+        <label onclick="quizRispondi(this,false)">ridondanza</label>
+        <label onclick="quizRispondi(this,true)" data-ok>atomicità dei valori</label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 21 : PALESTRA DERIVAZIONE ============ -->
+<section class="slide">
+  <span class="badge">PALESTRA 💪</span>
+  <h1>🏋️ Palestra: deriva lo schema logico</h1>
+  <p>Traduci in tabelle gli schemi E-R della guida del terzo anno. Scrivi la notazione con PK sottolineate e FK con asterisco, POI apri la soluzione.</p>
+  <div class="traccia"><span class="tnum">1</span> <b>La società sportiva:</b> Atleta(CodiceTessera, Nome, Cognome, DataNascita) – Tesserato 1:N – Squadra(NomeSquadra, Campionato).</div>
+  <details><summary>🔍 Soluzione</summary><div class="aiuto"><span class="mono">Squadra(<u>NomeSquadra</u>, Campionato)</span><br><span class="mono">Atleta(<u>CodiceTessera</u>, Nome, Cognome, DataNascita, NomeSquadra*)</span><br>FK nel lato N (Atleta). 2 tabelle in tutto.</div></details>
+  <div class="traccia"><span class="tnum">2</span> <b>La biblioteca:</b> Libro(ISBN, Titolo, Anno) – Prestito N:N con DataInizio e DataRiconsegna – Studente(Matricola, Nome, Cognome).</div>
+  <details><summary>🔍 Soluzione</summary><div class="aiuto"><span class="mono">Libro(<u>ISBN</u>, Titolo, Anno)</span><br><span class="mono">Studente(<u>Matricola</u>, Nome, Cognome)</span><br><span class="mono">Prestito(<u>ISBN*, Matricola*, DataInizio</u>, DataRiconsegna)</span><br><b>Nota fine:</b> DataInizio entra nella PK! Altrimenti lo stesso studente non potrebbe riprendere lo stesso libro una seconda volta.</div></details>
+  <div class="traccia"><span class="tnum">3</span> <b>La pizzeria:</b> Pizza–Contiene N:N–Ingrediente · Cameriere–Raccoglie 1:N–Ordinazione · Ordinazione–Include N:N (con Quantità)–Pizza.</div>
+  <details><summary>🔍 Soluzione</summary><div class="aiuto"><span class="mono">Pizza(<u>NomePizza</u>, Prezzo)</span> · <span class="mono">Ingrediente(<u>NomeIngrediente</u>, Allergeni)</span> · <span class="mono">Cameriere(<u>Codice</u>, Nome)</span> · <span class="mono">Ordinazione(<u>Numero</u>, Data, Tavolo, CodiceCameriere*)</span><br><span class="mono">Contiene(<u>NomePizza*, NomeIngrediente*</u>)</span> · <span class="mono">Include(<u>Numero*, NomePizza*</u>, Quantità)</span><br><b>Totale: 6 tabelle</b> (4 entità + 2 ponti). La Quantità sta nel ponte Include.</div></details>
+  <div class="traccia"><span class="tnum">4</span> <b>Sfida — la palestra con gerarchia:</b> Iscritto padre di Agonista e Amatore; Agonista–Partecipa N:N (con Piazzamento)–Gara.</div>
+  <details><summary>🔍 Soluzione</summary><div class="aiuto"><span class="mono">Iscritto(<u>CF</u>, Nome, DataIscrizione)</span><br><span class="mono">Agonista(<u>CF*</u>, CategoriaGara, CertificatoMedico)</span> · <span class="mono">Amatore(<u>CF*</u>, Obiettivo)</span><br><span class="mono">Gara(<u>CodGara</u>, Data, Luogo)</span> · <span class="mono">Partecipa(<u>CF*, CodGara*</u>, Piazzamento)</span><br><b>Attenzione:</b> la FK di Partecipa punta ad <b>Agonista</b>, non a Iscritto: solo gli agonisti gareggiano. 5 tabelle.</div></details>
+</section>
+
+<!-- ============ SLIDE 22 : ERRORI CLASSICI ============ -->
+<section class="slide">
+  <span class="badge">IL METODO</span>
+  <h1>⚠️ Gli errori classici della derivazione</h1>
+  <div class="cols">
+    <div>
+      <div class="box"><h2>🚫 Errori da matita rossa</h2>
+      <ul>
+        <li>FK nel lato <b>1</b> invece che nel lato N (la classe con la colonna "studenti"… dove li metti, in una cella?!)</li>
+        <li>N:N "risolta" senza tabella ponte</li>
+        <li>Tabella ponte <b>senza PK composta</b> (righe duplicate in agguato)</li>
+        <li>Attributo dell'associazione dimenticato per strada</li>
+      </ul></div>
+    </div>
+    <div>
+      <div class="box"><h2>🚫 Errori più sottili</h2>
+      <ul>
+        <li>Memorizzare attributi <b>derivati</b> (Età, Totale…)</li>
+        <li>Celle <b>non atomiche</b> ("telefoni: 333…, 06…")</li>
+        <li>Dimenticare che la FK della 1:1 va nel lato a partecipazione <b>totale</b></li>
+        <li>Nella IS-A: dare ai figli una PK nuova invece della PK=FK del padre</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="esempio"><b>💡 Auto-test finale:</b> per ogni FK chiediti "se cancello la riga puntata, cosa succede?" Se non sai rispondere, non hai ancora scelto la politica (RESTRICT/CASCADE/SET NULL) — e il progetto non è finito.</div>
+</section>
+
+<!-- ============ SLIDE 23 : MAPPA ============ -->
+<section class="slide">
+  <h1>🗺️ Mappa di riepilogo</h1>
+  <svg viewBox="0 0 820 420" width="780">
+    <rect x="280" y="10" width="260" height="60" rx="14" fill="#1e3a8a"/>
+    <text x="410" y="47" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">MODELLO RELAZIONALE</text>
+    <line x1="410" y1="70" x2="130" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="320" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="510" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="700" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <rect x="40" y="130" width="180" height="55" rx="12" fill="#3b82f6"/>
+    <text x="130" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">TABELLE 🗂️</text>
+    <rect x="240" y="130" width="160" height="55" rx="12" fill="#dc2626"/>
+    <text x="320" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">CHIAVI 🔑</text>
+    <rect x="430" y="130" width="160" height="55" rx="12" fill="#16a34a"/>
+    <text x="510" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">VINCOLI 🛡️</text>
+    <rect x="615" y="130" width="170" height="55" rx="12" fill="#c026d3"/>
+    <text x="700" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">DERIVAZIONE 🌉</text>
+    <line x1="130" y1="185" x2="130" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="35" y="225" width="190" height="80" rx="10" fill="#dbeafe"/>
+    <text x="130" y="250" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">tuple = righe</text>
+    <text x="130" y="272" text-anchor="middle" font-size="13" fill="#1e3a8a">attributi = colonne</text>
+    <text x="130" y="294" text-anchor="middle" font-size="13" fill="#1e3a8a">valori atomici · domini</text>
+    <line x1="320" y1="185" x2="320" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="235" y="225" width="170" height="80" rx="10" fill="#fee2e2"/>
+    <text x="320" y="250" text-anchor="middle" font-size="13" fill="#7f1d1d" font-weight="bold">PK: unica, mai NULL</text>
+    <text x="320" y="272" text-anchor="middle" font-size="13" fill="#7f1d1d">FK: punta alla PK</text>
+    <text x="320" y="294" text-anchor="middle" font-size="13" fill="#7f1d1d">PK composte (ponte)</text>
+    <line x1="510" y1="185" x2="510" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="425" y="225" width="170" height="80" rx="10" fill="#dcfce7"/>
+    <text x="510" y="250" text-anchor="middle" font-size="13" fill="#166534" font-weight="bold">dominio · entità</text>
+    <text x="510" y="272" text-anchor="middle" font-size="13" fill="#166534">referenziale!</text>
+    <text x="510" y="294" text-anchor="middle" font-size="13" fill="#166534">RESTRICT · CASCADE · SET NULL</text>
+    <line x1="700" y1="185" x2="700" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="612" y="225" width="176" height="80" rx="10" fill="#fdf2ff"/>
+    <text x="700" y="250" text-anchor="middle" font-size="13" fill="#86198f" font-weight="bold">1:1 → FK lato (1,1)</text>
+    <text x="700" y="272" text-anchor="middle" font-size="13" fill="#86198f">1:N → FK lato N</text>
+    <text x="700" y="294" text-anchor="middle" font-size="13" fill="#86198f">N:N → ponte · IS-A → PK=FK</text>
+    <rect x="230" y="340" width="360" height="55" rx="12" fill="#f97316"/>
+    <text x="410" y="364" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">E-R → regole di derivazione → tabelle</text>
+    <text x="410" y="384" text-anchor="middle" font-size="12" fill="#ffedd5">prossima fermata: costruirle davvero con Supabase!</text>
+  </svg>
+</section>
+
+<!-- ============ SLIDE 24 : FINE ============ -->
+<section class="slide">
+  <div class="center" style="padding-top:60px;">
+    <div style="font-size:5em;">🗂️</div>
+    <div class="titolone" style="font-size:2.4em;">Dallo schema alle tabelle: fatto!</div>
+    <p style="font-size:1.3em; margin-top:20px;">Conosci tuple, chiavi, vincoli e tutte le regole di derivazione.<br>I tuoi schemi E-R ora sanno diventare database veri.</p>
+    <div class="box" style="max-width:640px; margin:30px auto;">
+      <h2>📅 Prossima tappa — Supabase:</h2>
+      <p>creeremo un account gratuito, un database <b>PostgreSQL nel cloud</b>, costruiremo le tabelle con la GUI e imposteremo i <b>vincoli di integrità referenziale</b> con un clic. Dalla teoria alla pratica!</p>
+    </div>
+    <p style="color:var(--grigio); margin-top:20px;">Ripassa la regola d'oro: 1:N → FK nel lato N · N:N → tabella ponte. Il resto viene da sé.</p>
+  </div>
+</section>
+
+
+<div id="barra"></div>
+<nav id="nav">
+  <button id="btnPrev" onclick="vai(-1)">⬅ Indietro</button>
+  <span id="contatore"></span>
+  <button id="btnNext" onclick="vai(1)">Avanti ➡</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function mostra(){
+  slides.forEach((s,i)=>s.classList.toggle('active', i===cur));
+  document.getElementById('contatore').textContent = `Slide ${cur+1} / ${slides.length}`;
+  document.getElementById('btnPrev').disabled = (cur===0);
+  document.getElementById('btnNext').disabled = (cur===slides.length-1);
+  document.getElementById('barra').style.width = ((cur+1)/slides.length*100)+'%';
+  document.querySelector('.slide.active').scrollTop = 0;
+}
+function vai(d){ cur = Math.max(0, Math.min(slides.length-1, cur+d)); mostra(); }
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') vai(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') vai(-1);
+});
+function verifica(inputId, risposta, fbId){
+  const v = document.getElementById(inputId).value.trim().replace(/\s+/g,'').toLowerCase().replace(/:/g,'');
+  const fb = document.getElementById(fbId);
+  if(v===''){ fb.textContent='✏️ Scrivi una risposta!'; fb.className='fb'; return; }
+  const ok = risposta.split('|').some(r => v === r.toLowerCase());
+  if(ok){ fb.textContent='✅ Corretto! Bravo!'; fb.className='fb ok'; }
+  else{ fb.textContent='❌ Riprova…'; fb.className='fb no'; }
+}
+function quizRispondi(el, giusta){
+  const blocco = el.closest('.quiz');
+  blocco.querySelectorAll('label').forEach(l=>l.classList.remove('giusta','sbagliata'));
+  el.classList.add(giusta ? 'giusta' : 'sbagliata');
+  if(!giusta){ blocco.querySelector('label[data-ok]').classList.add('giusta'); }
+}
+mostra();
+</script>
+</body>
+</html>

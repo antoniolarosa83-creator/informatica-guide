@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informatica — Anno 4 · Guida a Supabase: il database nel cloud</title>
+<style>
+  :root{
+    --blu:#1e3a8a; --blu2:#3b82f6; --cielo:#dbeafe; --arancio:#f97316;
+    --giallo:#fbbf24; --verde:#16a34a; --rosso:#dc2626; --viola:#7c3aed;
+    --smeraldo:#10b981; --grigio:#475569; --sfondo:#f1f5f9; --carta:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--sfondo); color:#1e293b; overflow:hidden;}
+  .slide{display:none; position:fixed; inset:0 0 64px 0; overflow-y:auto; padding:36px 60px 30px 60px;}
+  .slide.active{display:block; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;}}
+  .slide h1{color:var(--blu); font-size:2.05em; border-bottom:4px solid var(--arancio); padding-bottom:8px; margin-bottom:20px;}
+  .slide h2{color:var(--blu2); font-size:1.3em; margin:16px 0 8px;}
+  .slide p, .slide li{font-size:1.1em; line-height:1.55;}
+  .slide ul, .slide ol{margin:10px 0 10px 28px;}
+  .slide li{margin-bottom:6px;}
+  .center{text-align:center;}
+  .cols{display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;}
+  .cols > div{flex:1; min-width:280px;}
+  .box{background:var(--carta); border-radius:14px; padding:16px 20px; box-shadow:0 2px 10px rgba(0,0,0,.09); margin:12px 0;}
+  .nota{background:#fff7ed; border-left:6px solid var(--arancio); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .curiosita{background:#f0fdf4; border-left:6px solid var(--verde); border-radius:8px; padding:12px 16px; margin:14px 0; font-size:1.05em;}
+  .esempio{background:#eef2ff; border-left:6px solid var(--viola); border-radius:8px; padding:12px 16px; margin:14px 0;}
+  .badge{display:inline-block; background:var(--arancio); color:#fff; border-radius:20px; padding:3px 14px; font-size:.8em; font-weight:bold; letter-spacing:1px; margin-bottom:10px;}
+  table{border-collapse:collapse; margin:14px auto; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  th{background:var(--blu); color:#fff; padding:8px 14px; font-size:.98em;}
+  td{border:1px solid #cbd5e1; padding:7px 13px; text-align:center; font-size:1.02em;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .mono{font-family:'Consolas','Courier New',monospace; font-weight:bold;}
+  svg{max-width:100%; height:auto; display:block; margin:10px auto;}
+  .schema{background:#fffbeb; border:2px solid #fcd34d; border-radius:10px; padding:14px 20px; font-family:Consolas,monospace; font-size:1.06em; line-height:1.8; margin:12px 0;}
+  .schema u{text-decoration:underline; font-weight:bold;}
+  .schema .fk{color:#4338ca; font-weight:bold;}
+  #nav{position:fixed; bottom:0; left:0; right:0; height:64px; background:var(--blu); display:flex; align-items:center; justify-content:space-between; padding:0 26px; z-index:10;}
+  #nav button{background:var(--arancio); color:#fff; border:none; border-radius:10px; padding:10px 26px; font-size:1.05em; font-weight:bold; cursor:pointer;}
+  #nav button:hover{background:#ea580c;}
+  #nav button:disabled{background:#64748b; cursor:default;}
+  #contatore{color:#fff; font-size:1.1em; font-weight:bold;}
+  #barra{position:fixed; bottom:64px; left:0; height:5px; background:var(--arancio); z-index:11; transition:width .3s;}
+  .quiz{background:#fff; border-radius:12px; padding:16px 20px; margin:12px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .quiz p{font-weight:bold; margin-bottom:8px;}
+  .quiz label{display:block; padding:7px 12px; border-radius:8px; cursor:pointer; margin:4px 0; border:2px solid transparent; font-size:1.05em;}
+  .quiz label:hover{background:var(--cielo);}
+  .quiz label.giusta{background:#dcfce7; border-color:var(--verde);}
+  .quiz label.sbagliata{background:#fee2e2; border-color:var(--rosso);}
+  .titolone{font-size:3em; color:var(--blu); margin:30px 0 10px;}
+  .sottotitolo{font-size:1.5em; color:var(--grigio);}
+  .passo{display:flex; gap:14px; align-items:flex-start; background:#fff; border-radius:12px; padding:12px 16px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .passo .num{background:var(--arancio); color:#fff; min-width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2em; font-weight:bold;}
+  .traccia{background:#fff; border:3px solid var(--blu2); border-radius:12px; padding:14px 20px; margin:12px 0; font-size:1.08em;}
+  .traccia .tnum{display:inline-block; background:var(--blu2); color:#fff; border-radius:8px; padding:2px 12px; font-weight:bold; margin-right:8px;}
+  details{background:#fff; border:2px dashed #94a3b8; border-radius:10px; padding:10px 16px; margin:8px 0;}
+  details summary{cursor:pointer; font-weight:bold; color:var(--blu); font-size:1.05em;}
+  details summary:hover{color:var(--arancio);}
+  details[open]{border-color:var(--verde); border-style:solid; background:#f0fdf4;}
+  details .aiuto{margin-top:10px; font-size:1.03em; line-height:1.6;}
+  /* finto screenshot GUI */
+  .gui{background:#0f172a; border-radius:12px; padding:14px; margin:12px auto; max-width:680px; box-shadow:0 4px 14px rgba(0,0,0,.25);}
+  .gui .bar{display:flex; gap:6px; margin-bottom:10px;}
+  .gui .dot{width:12px; height:12px; border-radius:50%;}
+  .gui .pannello{background:#1e293b; border-radius:8px; padding:14px 18px; color:#e2e8f0;}
+  .gui .pannello h3{color:#fff; font-size:1.05em; margin-bottom:10px;}
+  .gui .campo{display:flex; align-items:center; gap:10px; margin:8px 0;}
+  .gui .campo label{min-width:150px; font-size:.95em; color:#94a3b8;}
+  .gui .campo .inp{background:#0f172a; border:1px solid #475569; border-radius:6px; padding:6px 10px; color:#4ade80; font-family:Consolas,monospace; font-size:.95em; flex:1;}
+  .gui .btnv{background:#10b981; color:#052e16; font-weight:bold; border-radius:6px; padding:8px 18px; display:inline-block; margin-top:10px; font-size:.95em;}
+  .gui .tag{display:inline-block; background:#334155; color:#cbd5e1; border-radius:5px; padding:2px 8px; font-size:.85em; margin-left:6px;}
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 : COPERTINA ============ -->
+<section class="slide active">
+  <div class="center" style="padding-top:25px;">
+    <svg viewBox="0 0 560 200" width="480">
+      <path d="M300 20 L180 120 h80 l-20 60 L360 80 h-80 z" fill="#10b981" stroke="#047857" stroke-width="3"/>
+      <rect x="60 " y="60" width="90" height="26" rx="5" fill="#1e3a8a"/><text x="105" y="78" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Studente</text>
+      <rect x="60" y="96" width="90" height="26" rx="5" fill="#1e3a8a"/><text x="105" y="114" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">Classe</text>
+      <path d="M150 88 q20 5 25 15" stroke="#4338ca" stroke-width="3" fill="none" stroke-dasharray="5 3"/>
+      <rect x="420" y="60" width="90" height="26" rx="5" fill="#7c3aed"/><text x="465" y="78" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">☁️ cloud</text>
+      <rect x="420" y="96" width="90" height="26" rx="5" fill="#7c3aed"/><text x="465" y="114" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">PostgreSQL</text>
+    </svg>
+    <div class="titolone" style="font-size:2.5em;">SUPABASE</div>
+    <div class="sottotitolo">Guida in linea — Dal modello logico al database reale</div>
+    <p style="margin-top:22px; font-size:1.2em;">Creare l'account e il database · Il Table Editor (GUI)<br>Costruire lo schema logico · Il vincolo di integrità referenziale con un clic</p>
+    <p style="margin-top:24px; color:var(--grigio);">Usa le frecce ⬅ ➡ della tastiera o i pulsanti in basso per navigare</p>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 : INDICE ============ -->
+<section class="slide">
+  <h1>📚 Cosa faremo (con il mouse!)</h1>
+  <div class="cols">
+    <div>
+      <div class="box"><h2>1️⃣ Conoscere Supabase</h2><p>Cos'è, perché lo usiamo a scuola e cosa c'è "sotto il cofano" (PostgreSQL).</p></div>
+      <div class="box"><h2>2️⃣ Account e progetto</h2><p>Registrazione gratuita, creazione dell'organizzazione e del primo database nel cloud.</p></div>
+      <div class="box"><h2>3️⃣ Il Table Editor</h2><p>La GUI per creare tabelle, colonne, tipi di dato e chiavi primarie senza scrivere codice.</p></div>
+    </div>
+    <div>
+      <div class="box"><h2>4️⃣ Lo schema logico</h2><p>Costruiremo il nostro schema Studente–Classe–Corso, esattamente come derivato dalla teoria.</p></div>
+      <div class="box"><h2>5️⃣ Il vincolo referenziale</h2><p>Creare una foreign key dalla GUI, scegliere la politica ON DELETE e… vedere il database difendersi!</p></div>
+      <div class="box"><h2>6️⃣ Esercitazione finale</h2><p>Checklist completa + esercizi per ricostruire su Supabase gli schemi della palestra.</p></div>
+    </div>
+  </div>
+  <div class="nota"><b>📌 Nota versione:</b> le schermate dei servizi cloud cambiano spesso. I nomi dei pulsanti indicati qui potrebbero variare leggermente: cerca il <b>concetto</b> ("nuova tabella", "foreign key"), non la posizione esatta del pulsante.</div>
+</section>
+
+<!-- ============ SLIDE 3 : COS'È SUPABASE ============ -->
+<section class="slide">
+  <span class="badge">CONOSCERE SUPABASE</span>
+  <h1>☁️ Che cos'è Supabase?</h1>
+  <div class="cols">
+    <div>
+      <p><b>Supabase</b> è una piattaforma cloud che ti dà un <b>database PostgreSQL</b> completo, gestibile dal browser, con:</p>
+      <ul>
+        <li>un <b>piano gratuito</b> perfetto per la scuola</li>
+        <li>una <b>GUI</b> (interfaccia grafica) per creare tabelle senza codice: il <b>Table Editor</b></li>
+        <li>un <b>SQL Editor</b> per quando vorrai scrivere query "vere"</li>
+        <li>servizi extra (autenticazione, API): per progetti futuri!</li>
+      </ul>
+      <p>Sito ufficiale: <span class="mono">supabase.com</span></p>
+    </div>
+    <div>
+      <div class="curiosita"><b>🔎 PostgreSQL chi?</b> È uno dei DBMS relazionali più potenti e usati al mondo, open source, nato all'università di Berkeley. Supabase te lo serve "pronto all'uso" nel cloud: tu pensi allo schema, lui pensa ai server.</div>
+      <div class="esempio"><b>💡 Perché ci piace per la didattica:</b> tutto ciò che abbiamo studiato — tabelle, PK, FK, vincolo referenziale, politiche CASCADE — in Supabase si <b>vede e si clicca</b>. La teoria diventa un laboratorio.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 4 : CREARE ACCOUNT ============ -->
+<section class="slide">
+  <span class="badge">ACCOUNT E PROGETTO</span>
+  <h1>👤 Passo 1: creare l'account</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Vai su <span class="mono">supabase.com</span> e clicca <b>Start your project</b> (o <b>Sign up</b>).</div></div>
+      <div class="passo"><div class="num">2</div><div>Scegli come registrarti: <b>con GitHub</b> (consigliato se hai già l'account del progetto di classe!) oppure con <b>email e password</b>.</div></div>
+      <div class="passo"><div class="num">3</div><div>Se usi l'email: riceverai un <b>messaggio di conferma</b> — clicca il link per attivare l'account.</div></div>
+      <div class="passo"><div class="num">4</div><div>Al primo accesso ti viene creata (o richiesta) una <b>organizzazione</b>: è il "contenitore" dei tuoi progetti. Va bene il piano <b>Free</b>.</div></div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Sign in to Supabase</h3>
+          <div class="btnv" style="background:#334155; color:#fff; width:100%; text-align:center;">🐙 Continue with GitHub</div>
+          <p style="text-align:center; color:#64748b; margin:8px 0;">— oppure —</p>
+          <div class="campo"><label>Email</label><span class="inp">nome@scuola.it</span></div>
+          <div class="campo"><label>Password</label><span class="inp">••••••••••</span></div>
+          <div class="btnv">Sign Up →</div>
+        </div>
+      </div>
+      <div class="nota"><b>📌 A scuola:</b> usa l'email scolastica e una password nuova (mai riciclare quelle personali!). Annota le credenziali sul quaderno di laboratorio.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 5 : CREARE PROGETTO ============ -->
+<section class="slide">
+  <span class="badge">ACCOUNT E PROGETTO</span>
+  <h1>🗄️ Passo 2: creare il database (New Project)</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Dalla dashboard clicca <b>New project</b>.</div></div>
+      <div class="passo"><div class="num">2</div><div><b>Name:</b> il nome del progetto, es. <span class="mono">scuola-db</span>.</div></div>
+      <div class="passo"><div class="num">3</div><div><b>Database Password:</b> genera una password robusta e <b>CONSERVALA</b>: protegge il database vero e proprio.</div></div>
+      <div class="passo"><div class="num">4</div><div><b>Region:</b> scegli una regione europea (es. Frankfurt): dati più vicini = risposte più veloci.</div></div>
+      <div class="passo"><div class="num">5</div><div>Clicca <b>Create new project</b> e attendi 1-2 minuti: Supabase sta accendendo un intero server PostgreSQL per te! ⚙️</div></div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Create a new project <span class="tag">org: mia-classe</span></h3>
+          <div class="campo"><label>Name</label><span class="inp">scuola-db</span></div>
+          <div class="campo"><label>Database Password</label><span class="inp">••••••••••••• 💪 Strong</span></div>
+          <div class="campo"><label>Region</label><span class="inp">Central EU (Frankfurt)</span></div>
+          <div class="btnv">Create new project</div>
+        </div>
+      </div>
+      <div class="nota"><b>📌 Password del database ≠ password dell'account!</b> Sono due cose diverse. Quella del database serve per le connessioni esterne: se la perdi si può resettare, ma meglio scriverla subito in un posto sicuro.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 6 : LA DASHBOARD ============ -->
+<section class="slide">
+  <span class="badge">ACCOUNT E PROGETTO</span>
+  <h1>🧭 La dashboard: orientiamoci</h1>
+  <div class="cols">
+    <div>
+      <p>A sinistra trovi il <b>menu del progetto</b>. Le voci che useremo:</p>
+      <table style="font-size:1.02em;">
+        <tr><th>Voce</th><th>A cosa serve</th></tr>
+        <tr><td><b>Table Editor</b> 🗂️</td><td>creare e riempire tabelle con la GUI: casa nostra!</td></tr>
+        <tr><td><b>SQL Editor</b> 📝</td><td>scrivere query SQL (prossimo capitolo del corso)</td></tr>
+        <tr><td><b>Database</b> 🛠️</td><td>vedere schema, relazioni tra tabelle, backup</td></tr>
+        <tr><td><b>Authentication</b> 👥</td><td>gestire utenti (per progetti web futuri)</td></tr>
+        <tr><td><b>Project Settings</b> ⚙️</td><td>credenziali, API key, reset password</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello" style="display:flex; gap:14px;">
+          <div style="min-width:140px; border-right:1px solid #334155; padding-right:10px;">
+            <p style="color:#4ade80; font-weight:bold; font-size:.95em;">▸ Table Editor</p>
+            <p style="color:#94a3b8; font-size:.95em;">SQL Editor</p>
+            <p style="color:#94a3b8; font-size:.95em;">Database</p>
+            <p style="color:#94a3b8; font-size:.95em;">Authentication</p>
+            <p style="color:#94a3b8; font-size:.95em;">Storage</p>
+            <p style="color:#94a3b8; font-size:.95em;">Settings</p>
+          </div>
+          <div style="flex:1;">
+            <h3>scuola-db <span class="tag">Free plan</span></h3>
+            <p style="color:#94a3b8; font-size:.9em;">Welcome to your new project.</p>
+            <div class="btnv" style="margin-top:16px;">+ New table</div>
+          </div>
+        </div>
+      </div>
+      <div class="esempio"><b>💡 Consiglio:</b> passa 5 minuti a cliccare in giro senza paura: nel piano Free non puoi rompere nulla che non si possa ricreare.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 7 : IL NOSTRO SCHEMA ============ -->
+<section class="slide">
+  <span class="badge">LO SCHEMA LOGICO</span>
+  <h1>📐 Il progetto da realizzare</h1>
+  <p>Costruiremo lo schema logico "scolastico" derivato con le regole del modello relazionale:</p>
+  <div class="schema">Classe(<u>id</u>, nome, aula)
+Studente(<u>id</u>, cognome, nome, data_nascita, <span class="fk">classe_id*</span>)     ← 1:N
+Corso(<u>id</u>, titolo)
+Iscrizione(<u><span class="fk">studente_id*</span>, <span class="fk">corso_id*</span></u>, voto)                  ← ponte N:N</div>
+  <div class="cols">
+    <div>
+      <div class="nota"><b>📌 Convenzioni "da database reale":</b> nomi di tabelle e colonne <b>in minuscolo</b>, senza spazi né accenti, con l'underscore: <span class="mono">data_nascita</span>, <span class="mono">classe_id</span>. Te le ritroverai identiche in SQL.</div>
+    </div>
+    <div>
+      <div class="esempio"><b>💡 Riconosci la teoria?</b> Classe–Studente è la <b>1:N</b> (FK nel lato N) e Iscrizione è la <b>tabella ponte</b> della N:N Studente–Corso, con l'attributo di associazione <b>voto</b>. Tutto torna!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 8 : PRIMA TABELLA ============ -->
+<section class="slide">
+  <span class="badge">TABLE EDITOR</span>
+  <h1>🗂️ Passo 3: creare la prima tabella (Classe)</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Apri il <b>Table Editor</b> e clicca <b>New table</b>.</div></div>
+      <div class="passo"><div class="num">2</div><div><b>Name:</b> <span class="mono">classe</span>. Facoltativa la Description.</div></div>
+      <div class="passo"><div class="num">3</div><div>Lascia attiva <b>Enable Row Level Security (RLS)</b>: è una protezione. Per i nostri esperimenti dalla GUI non disturba.</div></div>
+      <div class="passo"><div class="num">4</div><div>Supabase propone già le colonne <span class="mono">id</span> (la <b>PK automatica</b>!) e <span class="mono">created_at</span>. Teniamole.</div></div>
+      <div class="passo"><div class="num">5</div><div>Aggiungi con <b>Add column</b>: <span class="mono">nome</span> (tipo <b>text</b>) e <span class="mono">aula</span> (tipo <b>text</b>). Poi <b>Save</b>.</div></div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Create a new table</h3>
+          <div class="campo"><label>Name</label><span class="inp">classe</span></div>
+          <div class="campo"><label>RLS</label><span class="inp" style="color:#4ade80;">✔ enabled</span></div>
+          <p style="color:#94a3b8; margin:10px 0 4px;">Columns:</p>
+          <div class="campo"><span class="inp" style="flex:0.6;">id</span><span class="inp" style="flex:0.5;">int8</span><span class="tag" style="background:#7f1d1d; color:#fecaca;">🔑 Primary</span></div>
+          <div class="campo"><span class="inp" style="flex:0.6;">nome</span><span class="inp" style="flex:0.5;">text</span></div>
+          <div class="campo"><span class="inp" style="flex:0.6;">aula</span><span class="inp" style="flex:0.5;">text</span></div>
+          <div class="btnv">Save</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="curiosita"><b>🔎 Chi genera gli id?</b> La colonna id è di tipo <b>identity</b>: il DBMS assegna da solo 1, 2, 3… È la PK "artificiale" di cui parlava la teoria: comoda e a prova di errore.</div>
+</section>
+
+<!-- ============ SLIDE 9 : TIPI DI DATO ============ -->
+<section class="slide">
+  <span class="badge">TABLE EDITOR</span>
+  <h1>🧪 I tipi di dato PostgreSQL (quelli che ti servono)</h1>
+  <table style="font-size:1.04em;">
+    <tr><th>Tipo Supabase</th><th>Cosa contiene</th><th>Nel modello logico era…</th><th>Esempio</th></tr>
+    <tr><td class="mono">int8 / int4</td><td>numeri interi</td><td>Intero</td><td>42</td></tr>
+    <tr><td class="mono">numeric</td><td>numeri con decimali esatti</td><td>Reale (prezzi!)</td><td>19.90</td></tr>
+    <tr><td class="mono">text / varchar</td><td>testo</td><td>Stringa</td><td>"Bianchi"</td></tr>
+    <tr><td class="mono">date</td><td>date</td><td>Data</td><td>2008-03-12</td></tr>
+    <tr><td class="mono">bool</td><td>vero/falso</td><td>Booleano</td><td>true</td></tr>
+    <tr><td class="mono">timestamptz</td><td>data+ora con fuso</td><td>—</td><td>created_at</td></tr>
+  </table>
+  <div class="cols">
+    <div>
+      <div class="nota"><b>📌 Vincolo di dominio in azione:</b> scegliere il tipo È il vincolo di dominio! Se provi a mettere "ciao" in una colonna <span class="mono">date</span>, il DBMS rifiuta. Prova per credere.</div>
+    </div>
+    <div>
+      <div class="esempio"><b>💡 Altre opzioni per colonna nella GUI:</b> <b>Default value</b> (valore predefinito) · <b>Allow Nullable</b> (spunta = opzionale, togli la spunta = obbligatorio!) · <b>Is Unique</b> (mai due valori uguali).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 10 : TABELLA STUDENTE ============ -->
+<section class="slide">
+  <span class="badge">TABLE EDITOR</span>
+  <h1>🧑‍🎓 Passo 4: la tabella Studente (con colonna per la FK)</h1>
+  <div class="cols">
+    <div>
+      <p>Crea la seconda tabella come la prima:</p>
+      <ul>
+        <li><b>Name:</b> <span class="mono">studente</span></li>
+        <li>Colonne: <span class="mono">cognome</span> (text, <b>NOT NULL</b>: togli la spunta Nullable), <span class="mono">nome</span> (text), <span class="mono">data_nascita</span> (date)</li>
+        <li>e poi la colonna speciale: <span class="mono">classe_id</span> (tipo <b>int8</b>, lo stesso tipo della PK di classe!)</li>
+      </ul>
+      <div class="nota"><b>📌 Regola pratica FK:</b> la colonna che farà da chiave esterna deve avere <b>lo stesso tipo</b> della PK che punterà: id è int8 → classe_id è int8. Tipi diversi = errore assicurato.</div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Create a new table: studente</h3>
+          <div class="campo"><span class="inp" style="flex:0.7;">id</span><span class="inp" style="flex:0.4;">int8</span><span class="tag" style="background:#7f1d1d; color:#fecaca;">🔑</span></div>
+          <div class="campo"><span class="inp" style="flex:0.7;">cognome</span><span class="inp" style="flex:0.4;">text</span><span class="tag">not null</span></div>
+          <div class="campo"><span class="inp" style="flex:0.7;">nome</span><span class="inp" style="flex:0.4;">text</span></div>
+          <div class="campo"><span class="inp" style="flex:0.7;">data_nascita</span><span class="inp" style="flex:0.4;">date</span></div>
+          <div class="campo"><span class="inp" style="flex:0.7;">classe_id</span><span class="inp" style="flex:0.4;">int8</span><span class="tag" style="background:#312e81; color:#c7d2fe;">FK → tra poco!</span></div>
+          <div class="btnv">Save</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ SLIDE 11 : LA FOREIGN KEY ============ -->
+<section class="slide">
+  <span class="badge">VINCOLO REFERENZIALE</span>
+  <h1>🔗 Passo 5: il vincolo di integrità referenziale (GUI)</h1>
+  <div class="cols">
+    <div>
+      <p>Ora colleghiamo <span class="mono">studente.classe_id</span> alla PK di classe:</p>
+      <div class="passo"><div class="num">1</div><div>Nel Table Editor apri la tabella <b>studente</b> → <b>Edit table</b> (oppure modifica la colonna classe_id).</div></div>
+      <div class="passo"><div class="num">2</div><div>Accanto alla colonna <span class="mono">classe_id</span> clicca l'icona <b>🔗 link</b> / <b>Edit foreign key</b> → <b>Add foreign key relation</b>.</div></div>
+      <div class="passo"><div class="num">3</div><div>Scegli: schema <span class="mono">public</span> → tabella <span class="mono">classe</span> → colonna <span class="mono">id</span>.</div></div>
+      <div class="passo"><div class="num">4</div><div>Imposta le <b>Action</b> (vedi prossima slide) e conferma con <b>Save</b>.</div></div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Add foreign key relation</h3>
+          <div class="campo"><label>Column</label><span class="inp">studente.classe_id</span></div>
+          <div class="campo"><label>References schema</label><span class="inp">public</span></div>
+          <div class="campo"><label>References table</label><span class="inp">classe</span></div>
+          <div class="campo"><label>References column</label><span class="inp">classe.id</span></div>
+          <div class="campo"><label>On delete</label><span class="inp">Restrict</span></div>
+          <div class="btnv">Save</div>
+        </div>
+      </div>
+      <div class="nota"><b>📌 È tutto qui!</b> Con questi 4 clic hai dichiarato il <b>vincolo di integrità referenziale</b> studiato in teoria: da ora il DBMS controllerà ogni riga, per sempre, gratis.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 12 : ON DELETE ============ -->
+<section class="slide">
+  <span class="badge">VINCOLO REFERENZIALE</span>
+  <h1>⚖️ Le "Action": cosa fare se il padre sparisce?</h1>
+  <p>Quando crei la FK, la GUI chiede: <b>"Action if referenced row is removed"</b>. È la politica di reazione della teoria!</p>
+  <table style="font-size:1.05em;">
+    <tr><th>Opzione GUI</th><th>Significato</th><th>Esempio Classe→Studente</th></tr>
+    <tr><td class="mono">Restrict / No action</td><td>vieta la cancellazione se ci sono figli</td><td>non puoi cancellare la 4B finché ha studenti ✋</td></tr>
+    <tr><td class="mono">Cascade</td><td>cancella a cascata anche i figli</td><td>cancelli la 4B → spariscono anche i suoi studenti! 💥</td></tr>
+    <tr><td class="mono">Set NULL</td><td>i figli restano, con FK svuotata</td><td>gli studenti restano "senza classe" (classe_id = NULL)</td></tr>
+    <tr><td class="mono">Set default</td><td>FK impostata a un valore predefinito</td><td>gli studenti passano alla classe "in attesa"</td></tr>
+  </table>
+  <div class="cols">
+    <div>
+      <div class="esempio"><b>💡 Per il nostro schema scolastico:</b> scegli <b>Restrict</b> per Classe→Studente (prudenza!) e <b>Cascade</b> per Studente→Iscrizione (senza studente, le sue iscrizioni non hanno senso).</div>
+    </div>
+    <div>
+      <div class="nota"><b>📌 Nei compiti scritti:</b> saper <b>motivare</b> la scelta della politica vale quanto la FK stessa. Non esiste la scelta "sempre giusta": esiste quella giusta <b>per quella realtà</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 13 : INSERIRE DATI ============ -->
+<section class="slide">
+  <span class="badge">TABLE EDITOR</span>
+  <h1>✍️ Passo 6: inserire righe con la GUI</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Table Editor → tabella <b>classe</b> → <b>Insert</b> → <b>Insert row</b>.</div></div>
+      <div class="passo"><div class="num">2</div><div>Compila i campi (l'<b>id</b> lascialo vuoto: lo genera il DBMS) e salva. Crea 2-3 classi: 4A, 4B…</div></div>
+      <div class="passo"><div class="num">3</div><div>Ora la tabella <b>studente</b>: inserisci qualche studente scegliendo in <span class="mono">classe_id</span> un id <b>esistente</b> di classe (la GUI ti aiuta col selettore 🔍).</div></div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>table: classe <span class="tag">3 rows</span></h3>
+          <table style="width:100%; background:transparent; box-shadow:none; margin:6px 0;">
+            <tr><th style="background:#334155; font-size:.85em;">id</th><th style="background:#334155; font-size:.85em;">nome</th><th style="background:#334155; font-size:.85em;">aula</th></tr>
+            <tr><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">1</td><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">4A</td><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">Aula 7</td></tr>
+            <tr><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">2</td><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">4B</td><td style="border-color:#334155; color:#e2e8f0; background:transparent; font-size:.9em;">Aula 12</td></tr>
+          </table>
+          <div class="btnv">+ Insert row</div>
+        </div>
+      </div>
+      <div class="curiosita"><b>🔎 Ordine importante:</b> prima i <b>padri</b> (classe), poi i <b>figli</b> (studente). Non puoi iscrivere uno studente a una classe che ancora non esiste: è il vincolo referenziale che lavora già!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 14 : IL VINCOLO IN AZIONE ============ -->
+<section class="slide">
+  <span class="badge">VINCOLO REFERENZIALE</span>
+  <h1>🚨 L'esperimento: proviamo a violare il vincolo!</h1>
+  <div class="cols">
+    <div>
+      <h2>Esperimento 1 — FK inesistente</h2>
+      <p>Inserisci uno studente con <span class="mono">classe_id = 99</span> (nessuna classe ha id 99)…</p>
+      <div class="gui" style="max-width:100%;">
+        <div class="pannello" style="border:2px solid #ef4444;">
+          <p style="color:#fca5a5; font-family:Consolas,monospace; font-size:.9em;">❌ ERROR: insert or update on table "studente" violates foreign key constraint "studente_classe_id_fkey"</p>
+        </div>
+      </div>
+      <p style="font-size:.98em;">Il DBMS <b>rifiuta la riga</b>: il vincolo referenziale ti ha appena salvato da un dato orfano.</p>
+    </div>
+    <div>
+      <h2>Esperimento 2 — cancellare il padre</h2>
+      <p>Prova a cancellare la classe 4B mentre ha studenti (con ON DELETE <b>Restrict</b>)…</p>
+      <div class="gui" style="max-width:100%;">
+        <div class="pannello" style="border:2px solid #ef4444;">
+          <p style="color:#fca5a5; font-family:Consolas,monospace; font-size:.9em;">❌ ERROR: update or delete on table "classe" violates foreign key constraint... Key (id)=(2) is still referenced from table "studente"</p>
+        </div>
+      </div>
+      <p style="font-size:.98em;">Anche qui: <b>bloccato</b>. Sposta prima gli studenti (o scegli un'altra politica), poi cancella.</p>
+    </div>
+  </div>
+  <div class="nota"><b>📌 Questo esperimento È la lezione:</b> hai visto con i tuoi occhi la teoria del modello relazionale diventare un guardiano automatico dei tuoi dati. Fallo sempre vedere anche nei tuoi progetti d'esame!</div>
+</section>
+
+<!-- ============ SLIDE 15 : COMPLETARE LO SCHEMA ============ -->
+<section class="slide">
+  <span class="badge">LO SCHEMA LOGICO</span>
+  <h1>🌉 Passo 7: completare lo schema (la tabella ponte)</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Crea la tabella <span class="mono">corso</span>: id (PK), titolo (text).</div></div>
+      <div class="passo"><div class="num">2</div><div>Crea la tabella <span class="mono">iscrizione</span> con: <span class="mono">studente_id</span> (int8), <span class="mono">corso_id</span> (int8), <span class="mono">voto</span> (int4, Nullable: il voto arriva dopo!).</div></div>
+      <div class="passo"><div class="num">3</div><div>Aggiungi <b>due FK</b>: studente_id → studente.id (Cascade) e corso_id → corso.id (Cascade).</div></div>
+      <div class="passo"><div class="num">4</div><div>Rendi la <b>PK composta</b>: nella creazione tabella spunta <b>Primary</b> su entrambe le colonne studente_id e corso_id (e rimuovi la colonna id proposta).</div></div>
+    </div>
+    <div>
+      <div class="schema">iscrizione(<u><span class="fk">studente_id*</span>, <span class="fk">corso_id*</span></u>, voto)</div>
+      <div class="nota"><b>📌 La PK composta nella GUI:</b> puoi selezionare <b>più colonne</b> come Primary nella finestra di creazione della tabella: insieme formeranno la chiave composta. Proprio come da teoria: la coppia (studente, corso) non si ripete.</div>
+      <div class="esempio"><b>💡 Verifica finale:</b> inserisci un'iscrizione con lo stesso studente e lo stesso corso <b>due volte</b>: il DBMS rifiuta la seconda (violazione PK). Tre vincoli su tre, testati! 🏆</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 16 : SCHEMA VISUALIZER ============ -->
+<section class="slide">
+  <span class="badge">LO SCHEMA LOGICO</span>
+  <h1>👁️ Vedere lo schema: il visualizzatore</h1>
+  <div class="cols">
+    <div>
+      <p>Nel menu <b>Database</b> → <b>Schema Visualizer</b> Supabase disegna <b>automaticamente</b> il diagramma delle tue tabelle con le relazioni FK come frecce.</p>
+      <ul>
+        <li>Controlla che le frecce corrispondano al tuo schema logico</li>
+        <li>Manca una freccia? Hai dimenticato una FK!</li>
+        <li>Ottimo per gli <b>screenshot da consegnare</b> nelle relazioni di laboratorio 📸</li>
+      </ul>
+      <div class="curiosita"><b>🔎 Cerchio che si chiude:</b> siamo partiti dal diagramma E-R disegnato a mano… e finiamo con un diagramma disegnato dal database. Se i due si somigliano, hai lavorato bene!</div>
+    </div>
+    <div>
+      <div class="gui">
+        <div class="bar"><span class="dot" style="background:#ef4444;"></span><span class="dot" style="background:#eab308;"></span><span class="dot" style="background:#22c55e;"></span></div>
+        <div class="pannello">
+          <h3>Schema Visualizer</h3>
+          <svg viewBox="0 0 420 190" width="100%">
+            <rect x="20" y="20" width="110" height="60" rx="8" fill="#0f172a" stroke="#4ade80" stroke-width="2"/>
+            <text x="75" y="45" text-anchor="middle" font-size="12" fill="#4ade80" font-weight="bold">classe</text>
+            <text x="75" y="65" text-anchor="middle" font-size="10" fill="#94a3b8">id · nome · aula</text>
+            <rect x="170" y="20" width="120" height="60" rx="8" fill="#0f172a" stroke="#4ade80" stroke-width="2"/>
+            <text x="230" y="45" text-anchor="middle" font-size="12" fill="#4ade80" font-weight="bold">studente</text>
+            <text x="230" y="65" text-anchor="middle" font-size="10" fill="#94a3b8">id · cognome · classe_id</text>
+            <rect x="170" y="115" width="120" height="60" rx="8" fill="#0f172a" stroke="#4ade80" stroke-width="2"/>
+            <text x="230" y="140" text-anchor="middle" font-size="12" fill="#4ade80" font-weight="bold">iscrizione</text>
+            <text x="230" y="160" text-anchor="middle" font-size="10" fill="#94a3b8">studente_id · corso_id · voto</text>
+            <rect x="320" y="115" width="90" height="60" rx="8" fill="#0f172a" stroke="#4ade80" stroke-width="2"/>
+            <text x="365" y="140" text-anchor="middle" font-size="12" fill="#4ade80" font-weight="bold">corso</text>
+            <text x="365" y="160" text-anchor="middle" font-size="10" fill="#94a3b8">id · titolo</text>
+            <line x1="130" y1="50" x2="170" y2="50" stroke="#818cf8" stroke-width="2.5"/>
+            <line x1="230" y1="80" x2="230" y2="115" stroke="#818cf8" stroke-width="2.5"/>
+            <line x1="320" y1="145" x2="290" y2="145" stroke="#818cf8" stroke-width="2.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 17 : SBIRCIATA SQL ============ -->
+<section class="slide">
+  <span class="badge">VERSO SQL</span>
+  <h1>📝 Sbircia dietro la GUI: il codice SQL</h1>
+  <div class="cols">
+    <div>
+      <p>Tutto quello che hai cliccato, Supabase lo ha tradotto in <b>SQL</b>. Nel <b>SQL Editor</b> avresti potuto scrivere:</p>
+      <div class="schema" style="font-size:.98em;">create table studente (
+  id bigint generated by default
+     as identity <b>primary key</b>,
+  cognome text <b>not null</b>,
+  nome text,
+  data_nascita date,
+  classe_id bigint
+    <b>references classe(id)</b>
+    <b>on delete restrict</b>
+);</div>
+    </div>
+    <div>
+      <p>Riconosci tutto?</p>
+      <ul>
+        <li><span class="mono">primary key</span> → la PK ✓</li>
+        <li><span class="mono">not null</span> → attributo obbligatorio ✓</li>
+        <li><span class="mono">references classe(id)</span> → la FK, cioè il <b>vincolo di integrità referenziale</b> ✓</li>
+        <li><span class="mono">on delete restrict</span> → la politica di reazione ✓</li>
+      </ul>
+      <div class="nota"><b>📌 GUI e SQL sono due facce della stessa cosa.</b> La GUI è perfetta per imparare; l'SQL sarà il passo successivo del corso — e ora sai già <b>cosa</b> significa ogni riga.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 18 : ERRORI COMUNI ============ -->
+<section class="slide">
+  <span class="badge">PRONTO SOCCORSO</span>
+  <h1>🩹 Errori comuni e soluzioni</h1>
+  <table style="font-size:1.03em;">
+    <tr><th>Problema</th><th>Causa probabile</th><th>Soluzione</th></tr>
+    <tr><td>"violates foreign key constraint" inserendo</td><td>FK che punta a un id inesistente</td><td>crea prima la riga padre, poi il figlio</td></tr>
+    <tr><td>"violates foreign key constraint" cancellando</td><td>il padre ha ancora figli (Restrict)</td><td>sposta/cancella prima i figli, o rivedi la Action</td></tr>
+    <tr><td>Non riesco a creare la FK</td><td>tipi diversi (es. int8 vs text)</td><td>la colonna FK deve avere lo stesso tipo della PK</td></tr>
+    <tr><td>"duplicate key value violates unique constraint"</td><td>PK ripetuta</td><td>lascia generare l'id al DBMS; nel ponte: coppia già esistente</td></tr>
+    <tr><td>Il progetto sembra "spento"</td><td>i progetti Free si sospendono se inattivi a lungo</td><td>dashboard → Restore/Resume project e attendi</td></tr>
+    <tr><td>Password del database dimenticata</td><td>capita a tutti!</td><td>Project Settings → Database → Reset password</td></tr>
+  </table>
+  <div class="nota"><b>📌 Leggere gli errori è un'abilità:</b> il messaggio dice sempre <b>quale vincolo</b> è stato violato e <b>quale chiave</b> è coinvolta. Tradurre l'errore in italiano = aver capito il modello relazionale.</div>
+</section>
+
+<!-- ============ SLIDE 19 : ESERCITAZIONE GUIDATA ============ -->
+<section class="slide">
+  <span class="badge">ESERCITAZIONE</span>
+  <h1>🧪 Esercitazione guidata completa (checklist)</h1>
+  <div class="cols">
+    <div>
+      <div class="passo"><div class="num">1</div><div>Crea l'account su supabase.com e il progetto <span class="mono">scuola-db</span> ☐</div></div>
+      <div class="passo"><div class="num">2</div><div>Crea le tabelle <span class="mono">classe</span> e <span class="mono">studente</span> con i tipi giusti ☐</div></div>
+      <div class="passo"><div class="num">3</div><div>Aggiungi la FK <span class="mono">studente.classe_id → classe.id</span> (Restrict) ☐</div></div>
+      <div class="passo"><div class="num">4</div><div>Crea <span class="mono">corso</span> e la ponte <span class="mono">iscrizione</span> con PK composta e 2 FK (Cascade) ☐</div></div>
+    </div>
+    <div>
+      <div class="passo"><div class="num">5</div><div>Inserisci 2 classi, 4 studenti, 2 corsi, 5 iscrizioni ☐</div></div>
+      <div class="passo"><div class="num">6</div><div>Prova le <b>3 violazioni</b>: FK inesistente, cancellazione padre, PK duplicata nel ponte — e fotografa gli errori ☐</div></div>
+      <div class="passo"><div class="num">7</div><div>Apri lo <b>Schema Visualizer</b> e confronta con il tuo schema logico su carta ☐</div></div>
+      <div class="passo"><div class="num">8</div><div>Consegna: screenshot del visualizer + delle tabelle popolate + degli errori provocati ☐</div></div>
+    </div>
+  </div>
+  <div class="esempio"><b>💡 Tempo stimato:</b> 1 ora di laboratorio. La checklist è pensata per essere la tua <b>griglia di consegna</b>: spunta tutto e hai finito.</div>
+</section>
+
+<!-- ============ SLIDE 20 : ESERCIZI PROPOSTI ============ -->
+<section class="slide">
+  <span class="badge">ESERCITAZIONE</span>
+  <h1>💪 Esercizi proposti: porta i tuoi schemi nel cloud</h1>
+  <div class="traccia"><span class="tnum">1</span> <b>La società sportiva:</b> realizza su Supabase lo schema Squadra(1)–Atleta(N). FK con ON DELETE Restrict. Popola e prova a cancellare una squadra con atleti.</div>
+  <details><summary>🔍 Aiuto</summary><div class="aiuto">Tabelle: <span class="mono">squadra(id, nome, campionato)</span> · <span class="mono">atleta(id, nome, cognome, data_nascita, squadra_id*)</span>. La violazione da mostrare: DELETE su una squadra con atleti → errore Restrict.</div></details>
+  <div class="traccia"><span class="tnum">2</span> <b>La biblioteca:</b> Libro–Prestito(N:N con date)–Studente. Decidi tu: la PK di prestito può essere la coppia (libro, studente)? O serve anche data_inizio? Motiva!</div>
+  <details><summary>🔍 Aiuto</summary><div class="aiuto">Se lo studente può riprendere lo stesso libro in momenti diversi, la coppia non basta: PK = (libro_id, studente_id, data_inizio). In Supabase: tre colonne spuntate come Primary. È la stessa riflessione della palestra sul modello relazionale!</div></details>
+  <div class="traccia"><span class="tnum">3</span> <b>La pizzeria (sfida):</b> 6 tabelle, 2 ponti, FK a raffica. Scegli le politiche ON DELETE motivandole nella relazione (cosa succede se cancello una pizza dal menù? E un cameriere?).</div>
+  <details><summary>🔍 Aiuto</summary><div class="aiuto">Suggerimenti: pizza cancellata → Cascade su "contiene" (gli ingredienti della pizza sparita non servono) ma <b>Restrict</b> su "include" se ci sono ordinazioni storiche da conservare. Il cameriere licenziato? Set NULL sulle sue ordinazioni o Restrict: discutine, non c'è una sola risposta giusta.</div></details>
+</section>
+
+<!-- ============ SLIDE 21 : QUIZ ============ -->
+<section class="slide">
+  <span class="badge">ESERCITAZIONE</span>
+  <h1>🎯 Quiz finale</h1>
+  <div class="cols">
+    <div>
+      <div class="quiz">
+        <p>1) Il Table Editor di Supabase serve per…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>creare e riempire tabelle con la GUI</label>
+        <label onclick="quizRispondi(this,false)">scrivere programmi in Python</label>
+        <label onclick="quizRispondi(this,false)">disegnare schemi E-R a mano libera</label>
+      </div>
+      <div class="quiz">
+        <p>2) La colonna FK deve avere…</p>
+        <label onclick="quizRispondi(this,false)">un nome uguale alla tabella</label>
+        <label onclick="quizRispondi(this,true)" data-ok>lo stesso tipo della PK riferita</label>
+        <label onclick="quizRispondi(this,false)">sempre valori NULL</label>
+      </div>
+      <div class="quiz">
+        <p>3) "Key (id)=(2) is still referenced…" significa che…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>stai cancellando un padre che ha ancora figli</label>
+        <label onclick="quizRispondi(this,false)">la password è sbagliata</label>
+        <label onclick="quizRispondi(this,false)">il progetto è sospeso</label>
+      </div>
+    </div>
+    <div>
+      <div class="quiz">
+        <p>4) Con ON DELETE CASCADE su Studente→Iscrizione, cancellando uno studente…</p>
+        <label onclick="quizRispondi(this,false)">la cancellazione è vietata</label>
+        <label onclick="quizRispondi(this,true)" data-ok>spariscono anche le sue iscrizioni</label>
+        <label onclick="quizRispondi(this,false)">si cancella anche il corso</label>
+      </div>
+      <div class="quiz">
+        <p>5) La PK composta della tabella ponte si crea nella GUI…</p>
+        <label onclick="quizRispondi(this,true)" data-ok>spuntando "Primary" su entrambe le colonne FK</label>
+        <label onclick="quizRispondi(this,false)">non si può: serve sempre un id</label>
+        <label onclick="quizRispondi(this,false)">scrivendo un'email al supporto</label>
+      </div>
+      <div class="quiz">
+        <p>6) La password del database…</p>
+        <label onclick="quizRispondi(this,false)">è la stessa dell'account Supabase</label>
+        <label onclick="quizRispondi(this,true)" data-ok>è separata e va conservata (si può resettare)</label>
+        <label onclick="quizRispondi(this,false)">non esiste nel piano Free</label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 22 : GLOSSARIO ============ -->
+<section class="slide">
+  <span class="badge">RIFERIMENTO</span>
+  <h1>🌍 Mini-glossario GUI inglese → teoria italiana</h1>
+  <table style="font-size:1.05em;">
+    <tr><th>Nella GUI di Supabase</th><th>Nella teoria studiata</th></tr>
+    <tr><td class="mono">Table / Row / Column</td><td>relazione (tabella) / tupla / attributo</td></tr>
+    <tr><td class="mono">Primary (checkbox)</td><td>chiave primaria (PK)</td></tr>
+    <tr><td class="mono">Foreign key relation</td><td>chiave esterna (FK) + vincolo di integrità referenziale</td></tr>
+    <tr><td class="mono">Allow Nullable</td><td>attributo opzionale (spuntato) / obbligatorio (no)</td></tr>
+    <tr><td class="mono">Is Unique</td><td>chiave candidata (unicità)</td></tr>
+    <tr><td class="mono">Default value</td><td>valore predefinito del dominio</td></tr>
+    <tr><td class="mono">Type (int8, text, date…)</td><td>dominio dell'attributo</td></tr>
+    <tr><td class="mono">On delete: Restrict/Cascade/Set NULL</td><td>politiche di reazione del vincolo referenziale</td></tr>
+  </table>
+  <div class="nota"><b>📌 Consiglio d'esame:</b> nelle verifiche usa i termini <b>italiani della teoria</b>; in laboratorio riconosci quelli <b>inglesi della GUI</b>. Questa tabella è il tuo ponte.</div>
+</section>
+
+<!-- ============ SLIDE 23 : MAPPA ============ -->
+<section class="slide">
+  <h1>🗺️ Mappa di riepilogo</h1>
+  <svg viewBox="0 0 820 400" width="780">
+    <rect x="300" y="10" width="220" height="60" rx="14" fill="#10b981"/>
+    <text x="410" y="47" text-anchor="middle" font-size="19" fill="#fff" font-weight="bold">SUPABASE ⚡</text>
+    <line x1="410" y1="70" x2="150" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="410" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <line x1="410" y1="70" x2="670" y2="130" stroke="#94a3b8" stroke-width="4"/>
+    <rect x="60" y="130" width="180" height="55" rx="12" fill="#3b82f6"/>
+    <text x="150" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">ACCOUNT ☁️</text>
+    <rect x="320" y="130" width="180" height="55" rx="12" fill="#7c3aed"/>
+    <text x="410" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">TABLE EDITOR 🗂️</text>
+    <rect x="580" y="130" width="180" height="55" rx="12" fill="#dc2626"/>
+    <text x="670" y="164" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">VINCOLI 🛡️</text>
+    <line x1="150" y1="185" x2="150" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="55" y="225" width="190" height="85" rx="10" fill="#dbeafe"/>
+    <text x="150" y="250" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">supabase.com → Sign up</text>
+    <text x="150" y="272" text-anchor="middle" font-size="13" fill="#1e3a8a">New project + password DB</text>
+    <text x="150" y="294" text-anchor="middle" font-size="13" fill="#1e3a8a">region EU · piano Free</text>
+    <line x1="410" y1="185" x2="410" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="315" y="225" width="190" height="85" rx="10" fill="#ede9fe"/>
+    <text x="410" y="250" text-anchor="middle" font-size="13" fill="#5b21b6" font-weight="bold">New table · colonne · tipi</text>
+    <text x="410" y="272" text-anchor="middle" font-size="13" fill="#5b21b6">PK (anche composta)</text>
+    <text x="410" y="294" text-anchor="middle" font-size="13" fill="#5b21b6">Insert row · Visualizer</text>
+    <line x1="670" y1="185" x2="670" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="575" y="225" width="190" height="85" rx="10" fill="#fee2e2"/>
+    <text x="670" y="250" text-anchor="middle" font-size="13" fill="#7f1d1d" font-weight="bold">Add foreign key relation</text>
+    <text x="670" y="272" text-anchor="middle" font-size="13" fill="#7f1d1d">On delete: Restrict/Cascade</text>
+    <text x="670" y="294" text-anchor="middle" font-size="13" fill="#7f1d1d">gli errori = il vincolo che lavora</text>
+    <rect x="230" y="335" width="360" height="55" rx="12" fill="#f97316"/>
+    <text x="410" y="359" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">E-R → schema logico → Supabase: fatto! 🎓</text>
+    <text x="410" y="379" text-anchor="middle" font-size="12" fill="#ffedd5">prossimo capitolo: interrogare i dati con SQL</text>
+  </svg>
+</section>
+
+<!-- ============ SLIDE 24 : FINE ============ -->
+<section class="slide">
+  <div class="center" style="padding-top:60px;">
+    <div style="font-size:5em;">🚀</div>
+    <div class="titolone" style="font-size:2.4em;">Il tuo database è nel cloud!</div>
+    <p style="font-size:1.3em; margin-top:20px;">Account, progetto, tabelle, chiavi primarie e… vincoli referenziali<br>che si difendono da soli: la progettazione è diventata realtà.</p>
+    <div class="box" style="max-width:640px; margin:30px auto;">
+      <h2>📅 Prossimamente:</h2>
+      <p>il linguaggio <b>SQL</b> — SELECT, JOIN, INSERT, UPDATE — per interrogare e trasformare i dati del database che hai appena costruito. L'SQL Editor di Supabase ti sta già aspettando!</p>
+    </div>
+    <p style="color:var(--grigio); margin-top:20px;">Completa la checklist dell'esercitazione: è la tua prova di laboratorio. 🧪</p>
+  </div>
+</section>
+
+
+<div id="barra"></div>
+<nav id="nav">
+  <button id="btnPrev" onclick="vai(-1)">⬅ Indietro</button>
+  <span id="contatore"></span>
+  <button id="btnNext" onclick="vai(1)">Avanti ➡</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function mostra(){
+  slides.forEach((s,i)=>s.classList.toggle('active', i===cur));
+  document.getElementById('contatore').textContent = `Slide ${cur+1} / ${slides.length}`;
+  document.getElementById('btnPrev').disabled = (cur===0);
+  document.getElementById('btnNext').disabled = (cur===slides.length-1);
+  document.getElementById('barra').style.width = ((cur+1)/slides.length*100)+'%';
+  document.querySelector('.slide.active').scrollTop = 0;
+}
+function vai(d){ cur = Math.max(0, Math.min(slides.length-1, cur+d)); mostra(); }
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') vai(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') vai(-1);
+});
+function quizRispondi(el, giusta){
+  const blocco = el.closest('.quiz');
+  blocco.querySelectorAll('label').forEach(l=>l.classList.remove('giusta','sbagliata'));
+  el.classList.add(giusta ? 'giusta' : 'sbagliata');
+  if(!giusta){ blocco.querySelector('label[data-ok]').classList.add('giusta'); }
+}
+mostra();
+</script>
+</body>
+</html>
