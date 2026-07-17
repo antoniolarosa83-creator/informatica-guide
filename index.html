@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide di Informatica — Portale delle lezioni</title>
+<style>
+  :root{
+    --blu:#1e3a8a; --blu2:#3b82f6; --cielo:#dbeafe; --arancio:#f97316;
+    --verde:#16a34a; --viola:#7c3aed; --fucsia:#c026d3; --smeraldo:#10b981;
+    --grigio:#475569; --sfondo:#f1f5f9;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, sans-serif; background:var(--sfondo); color:#1e293b;}
+  header{background:linear-gradient(135deg, var(--blu) 0%, #312e81 100%); color:#fff; text-align:center; padding:48px 20px 40px;}
+  header h1{font-size:2.6em; letter-spacing:1px;}
+  header p{font-size:1.25em; color:#c7d2fe; margin-top:10px;}
+  header .bits{font-family:Consolas,monospace; color:#fbbf24; font-size:1em; margin-top:14px; letter-spacing:3px;}
+  main{max-width:1080px; margin:0 auto; padding:30px 20px 60px;}
+  .anno{margin-top:34px;}
+  .anno h2{font-size:1.6em; color:var(--blu); border-bottom:4px solid var(--arancio); padding-bottom:6px; margin-bottom:18px;}
+  .griglia{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
+  .card{
+    background:#fff; border-radius:16px; padding:22px; box-shadow:0 3px 12px rgba(0,0,0,.10);
+    border-top:8px solid var(--blu2); display:flex; flex-direction:column;
+    transition:transform .15s, box-shadow .15s; text-decoration:none; color:inherit;
+  }
+  .card:hover{transform:translateY(-4px); box-shadow:0 8px 22px rgba(0,0,0,.16);}
+  .card .icona{font-size:2.6em; margin-bottom:8px;}
+  .card h3{font-size:1.25em; color:var(--blu); margin-bottom:8px;}
+  .card p{font-size:1em; line-height:1.5; color:#334155; flex:1;}
+  .card .meta{margin-top:14px; display:flex; justify-content:space-between; align-items:center;}
+  .card .slidec{background:var(--cielo); color:var(--blu); border-radius:14px; padding:3px 12px; font-size:.85em; font-weight:bold;}
+  .card .apri{background:var(--arancio); color:#fff; border-radius:10px; padding:8px 18px; font-weight:bold; font-size:.95em;}
+  .card.c-verde{border-top-color:var(--verde);}
+  .card.c-viola{border-top-color:var(--viola);}
+  .card.c-fucsia{border-top-color:var(--fucsia);}
+  .card.c-smeraldo{border-top-color:var(--smeraldo);}
+  .card.c-arancio{border-top-color:var(--arancio);}
+  .info{background:#fff7ed; border-left:6px solid var(--arancio); border-radius:10px; padding:14px 18px; margin-top:36px; font-size:1.02em; line-height:1.55;}
+  footer{text-align:center; color:var(--grigio); padding:26px 20px; font-size:.95em;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Guide di Informatica</h1>
+  <p>Il portale delle lezioni — slide navigabili, esempi ed esercizi interattivi</p>
+  <div class="bits">01000011 01001001 01000001 01001111</div>
+</header>
+
+<main>
+
+  <section class="anno">
+    <h2>1️⃣ Primo anno — Il computer e il binario</h2>
+    <div class="griglia">
+      <a class="card" href="guida_informatica_anno1.html">
+        <div class="icona">🖥️</div>
+        <h3>Architettura del computer</h3>
+        <p>CPU, memorie, input/output, modello di von Neumann e la codifica binario-decimale, con esercizi di conversione a correzione automatica.</p>
+        <div class="meta"><span class="slidec">34 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="anno">
+    <h2>2️⃣ Secondo anno — Gli algoritmi</h2>
+    <div class="griglia">
+      <a class="card c-verde" href="guida_informatica_anno2.html">
+        <div class="icona">🧩</div>
+        <h3>Algoritmi e Flowgorithm</h3>
+        <p>Diagrammi di flusso, download e uso di Flowgorithm, variabili, selezione, connettivi logici e cicli FOR, WHILE e DO-WHILE.</p>
+        <div class="meta"><span class="slidec">35 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+      <a class="card c-arancio" href="appendice_esercizi_anno2.html">
+        <div class="icona">💪</div>
+        <h3>Appendice — Esercizi guidati</h3>
+        <p>Un esercizio svolto passo-passo per ogni argomento (sequenza, selezione, cicli) e 15 esercizi proposti con suggerimenti a scomparsa.</p>
+        <div class="meta"><span class="slidec">13 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="anno">
+    <h2>3️⃣ Terzo anno — Le basi di dati</h2>
+    <div class="griglia">
+      <a class="card c-fucsia" href="progettazione_concettuale_anno3.html">
+        <div class="icona">📐</div>
+        <h3>La progettazione concettuale (E-R)</h3>
+        <p>Entità, attributi, chiavi, associazioni con cardinalità e gerarchie IS-A. Con 2 esercizi guida svolti e una palestra di 9 tracce con soluzioni.</p>
+        <div class="meta"><span class="slidec">41 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="anno">
+    <h2>4️⃣ Quarto anno — Dal modello logico al cloud</h2>
+    <div class="griglia">
+      <a class="card c-viola" href="modello_relazionale_anno4.html">
+        <div class="icona">🗂️</div>
+        <h3>Il modello logico relazionale</h3>
+        <p>Tabelle, tuple, chiavi primarie ed esterne, vincoli di integrità e tutte le regole di derivazione da E-R a relazionale, con esercizi.</p>
+        <div class="meta"><span class="slidec">24 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+      <a class="card c-smeraldo" href="guida_supabase_anno4.html">
+        <div class="icona">⚡</div>
+        <h3>Guida a Supabase</h3>
+        <p>Account, database nel cloud, Table Editor, chiavi primarie e vincolo di integrità referenziale dalla GUI, con esercitazione di laboratorio.</p>
+        <div class="meta"><span class="slidec">24 slide</span><span class="apri">Apri ➜</span></div>
+      </a>
+    </div>
+  </section>
+
+  <div class="info">
+    <b>📌 Come si usano le guide:</b> ogni guida è una presentazione navigabile — frecce ⬅ ➡ della tastiera o pulsanti in basso. Gli esercizi con la casella "Verifica" danno la correzione immediata; le soluzioni 🔍 si aprono con un clic (prima prova da solo!). Funzionano su PC, LIM, tablet e telefono.
+  </div>
+
+</main>
+
+<footer>
+  Guide di studio di informatica per le superiori · prof. La Rosa<br>
+  <span style="font-size:.88em;">* Il titolo in binario? Decodificalo: è il saluto della copertina! 😉</span>
+</footer>
+
+</body>
+</html>
